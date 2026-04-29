@@ -26,6 +26,7 @@ export default function Footer() {
             <li><Link to="/stays" className="hover:text-primary">Stays</Link></li>
             <li><Link to="/experiences" className="hover:text-primary">Local Experiences</Link></li>
             <li><Link to="/marketplace" className="hover:text-primary">Marketplace</Link></li>
+            <li><Link to="/onboard" className="hover:text-primary">List your business</Link></li>
           </ul>
         </div>
 

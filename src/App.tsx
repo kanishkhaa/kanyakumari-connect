@@ -11,6 +11,8 @@ import Stays from "./pages/Stays";
 import Experiences from "./pages/Experiences";
 import Marketplace from "./pages/Marketplace";
 import FoodEvents from "./pages/FoodEvents";
+import Onboard from "./pages/Onboard";
+import SearchPage from "./pages/SearchPage";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/experiences" element={<Experiences />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/food" element={<FoodEvents />} />
+          <Route path="/onboard" element={<Onboard />} />
+          <Route path="/search" element={<SearchPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
