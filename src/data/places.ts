@@ -4,6 +4,8 @@ import templeImg from "@/assets/place-temple.jpg";
 import beachImg from "@/assets/place-beach.jpg";
 import palaceImg from "@/assets/place-palace.jpg";
 import waterfallImg from "@/assets/place-waterfall.jpg";
+import vattakottaiImg from "@/assets/place-vattakottai.jpg";
+import aqueductImg from "@/assets/place-aqueduct.jpg";
 
 export type Place = {
   id: string;
@@ -183,6 +185,58 @@ export const places: Place[] = [
     tips: [
       "Carry change of clothes for bathing",
       "Visit early to avoid crowds on weekends",
+    ],
+  },
+  {
+    id: "vattakottai-fort",
+    name: "Vattakottai Fort",
+    tagline: "18th-century seaside fortress with panoramic ocean views",
+    category: "Heritage",
+    image: vattakottaiImg,
+    rating: 4.6,
+    ticket: "Free",
+    timings: "8:00 AM – 5:30 PM",
+    bestTime: "October to March, sunset hours",
+    duration: "1–2 hours",
+    distance: "6 km from Kanyakumari town",
+    description:
+      "A circular black-granite fort built by Captain Eustachius De Lannoy of the Travancore army in the 18th century. The ramparts offer sweeping views of the Bay of Bengal and the Western Ghats foothills.",
+    highlights: [
+      "Massive granite walls 25–26 ft high",
+      "View of Mahendragiri hills on clear days",
+      "Quiet golden-sand cove at the fort base",
+    ],
+    howToReach: "Auto/taxi from Kanyakumari town (15 min). Local buses to Vattakottai run hourly.",
+    nearbyBus: "Vattakottai junction stop — 500 m walk.",
+    tips: [
+      "Carry water — no shops inside fort",
+      "Arrive 1 hour before sunset for the best light",
+    ],
+  },
+  {
+    id: "mathur-aqueduct",
+    name: "Mathur Hanging Trough Aqueduct",
+    tagline: "One of Asia's longest and tallest aqueducts",
+    category: "Heritage",
+    image: aqueductImg,
+    rating: 4.5,
+    ticket: "Free",
+    timings: "Open 24 hours (best in daylight)",
+    bestTime: "August to January",
+    duration: "1–2 hours",
+    distance: "60 km from Kanyakumari",
+    description:
+      "Built in 1966 to carry irrigation water across the Pahrali river valley. The trough stretches 1 km and rises 115 ft above ground, surrounded by lush green hills. Visitors can walk along the side path.",
+    highlights: [
+      "1 km long, 115 ft high",
+      "Walk across the trough for valley views",
+      "Surrounded by rubber and banana plantations",
+    ],
+    howToReach: "Bus from Kanyakumari to Thiruvattar, then auto (4 km) to Mathur.",
+    nearbyBus: "Thiruvattar Bus Stand — 4 km away.",
+    tips: [
+      "Wear non-slip footwear for the trough walk",
+      "Combine with a visit to Thirparappu Falls",
     ],
   },
 ];
