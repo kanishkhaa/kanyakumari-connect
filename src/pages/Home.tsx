@@ -294,6 +294,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Plan & services strip */}
+      <section className="container mx-auto py-20 px-4">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary">Hospitality services</p>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mt-1">Everything you need for the trip</h2>
+          </div>
+          <Link to="/hospitality" className="text-sm text-primary hover:underline hidden sm:block">All services →</Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {[
+            { to: "/travelcare", label: "TravelCare" },
+            { to: "/operators", label: "Tour Operators" },
+            { to: "/dtpc", label: "DTPC Centres" },
+            { to: "/ebrochures", label: "eBrochures" },
+            { to: "/microsites", label: "Microsites" },
+            { to: "/specialities", label: "Specialities" },
+            { to: "/things-to-buy", label: "Things to Buy" },
+            { to: "/photo-gallery", label: "Photo Gallery" },
+            { to: "/video-gallery", label: "Video Gallery" },
+            { to: "/events", label: "Events" },
+            { to: "/districts", label: "Regions" },
+            { to: "/faq", label: "FAQ" },
+          ].map((s) => (
+            <Link key={s.to} to={s.to} className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:shadow-soft transition-smooth text-center">
+              <p className="text-sm font-medium">{s.label}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Community / Vendor onboarding */}
       <section className="container mx-auto pb-24 px-4">
         <div className="rounded-3xl gradient-ocean p-10 md:p-16 text-background relative overflow-hidden">
