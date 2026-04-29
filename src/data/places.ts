@@ -4,6 +4,8 @@ import templeImg from "@/assets/place-temple.jpg";
 import beachImg from "@/assets/place-beach.jpg";
 import palaceImg from "@/assets/place-palace.jpg";
 import waterfallImg from "@/assets/place-waterfall.jpg";
+import vattakottaiImg from "@/assets/place-vattakottai.jpg";
+import aqueductImg from "@/assets/place-aqueduct.jpg";
 
 export type Place = {
   id: string;
