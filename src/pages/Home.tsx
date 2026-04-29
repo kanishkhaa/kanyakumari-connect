@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, MapPin, Calendar, Home, Sparkles, Heart, ShoppingBag } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, Home as HomeIcon, Sparkles, Heart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-kanyakumari.jpg";
 import { places } from "@/data/places";
@@ -9,7 +9,7 @@ import PlaceCard from "@/components/PlaceCard";
 const features = [
   { icon: MapPin, title: "Verified Places", desc: "Accurate timings, tickets and routes for every attraction.", to: "/places" },
   { icon: Calendar, title: "Smart Itinerary", desc: "Day-wise plans tailored to your days, budget and interests.", to: "/itinerary" },
-  { icon: Home, title: "Trusted Stays", desc: "Approved homestays, eco-lodges and tribal stays only.", to: "/stays" },
+  { icon: HomeIcon, title: "Trusted Stays", desc: "Approved homestays, eco-lodges and tribal stays only.", to: "/stays" },
   { icon: Heart, title: "Local Experiences", desc: "Authentic village tours, crafts and cuisine with hosts.", to: "/experiences" },
   { icon: ShoppingBag, title: "Artisan Marketplace", desc: "Buy directly from Kanyakumari's artisans and weavers.", to: "/marketplace" },
   { icon: Sparkles, title: "Events & Festivals", desc: "Plan around temple festivals and cultural fairs.", to: "/food" },
