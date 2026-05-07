@@ -19,13 +19,11 @@ export default function Navbar() {
     { to: "/experiences", label: t("nav_experiences") },
     { to: "/itinerary", label: t("nav_plan") },
     { to: "/stays", label: t("nav_stays") },
-    { to: "/districts", label: t("nav_districts") },
     { to: "/food", label: t("nav_food") },
   ];
 
   const moreLinks = [
     { to: "/travelcare", label: t("nav_travelcare") },
-    { to: "/microsites", label: t("nav_microsites") },
     { to: "/events", label: t("nav_events") },
     { to: "/ebrochures", label: t("nav_brochures") },
     { to: "/dtpc", label: t("nav_dtpc") },
@@ -35,7 +33,6 @@ export default function Navbar() {
     { to: "/specialities", label: t("nav_specialities") },
     { to: "/hospitality", label: t("nav_hospitality") },
     { to: "/operators", label: t("nav_operators") },
-    { to: "/marketplace", label: t("nav_shop") },
     { to: "/faq", label: t("nav_faq") },
   ];
 

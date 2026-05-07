@@ -4,7 +4,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { Calendar, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const cats = ["All", "Festival", "Cultural", "Sports", "Spiritual", "Fair"] as const;
+const cats = ["All", "Festival", "Cultural", "Spiritual", "Fair"] as const;
 
 export default function Events() {
   const { t } = useI18n();
@@ -25,21 +25,22 @@ export default function Events() {
         ))}
       </div>
 
-      <div className="mt-10 space-y-4">
+      <div className="mt-10 grid md:grid-cols-2 xl:grid-cols-3 gap-6">
         {list.map((e) => (
-          <article key={e.id} className="grid sm:grid-cols-[120px_1fr_auto] gap-5 p-5 rounded-2xl border border-border bg-card hover:shadow-soft transition-smooth">
-            <div className="flex sm:flex-col items-center sm:items-start justify-center sm:justify-start gap-2 sm:gap-0 p-3 rounded-xl gradient-warm text-center">
-              <p className="text-xs uppercase tracking-widest font-semibold">{e.month}</p>
-              <p className="font-display text-2xl font-bold">{e.date.split(",")[0]}</p>
+          <article key={e.id} className="overflow-hidden rounded-xl border border-border bg-card hover:shadow-elevated transition-smooth group">
+            <div className="relative aspect-[4/3] overflow-hidden">
+              <img src={e.image} alt={e.title} loading="lazy" className="h-full w-full object-cover transition-smooth duration-700 group-hover:scale-105" />
+              <div className="absolute left-4 top-4 bg-background/95 px-3 py-2 text-center shadow-soft">
+                <p className="text-xs uppercase tracking-widest font-semibold text-primary">{e.month}</p>
+                <p className="font-display text-lg font-bold">{e.date}</p>
+              </div>
             </div>
-            <div>
+            <div className="p-5">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">{e.category}</span>
               <h3 className="mt-1 font-display text-xl font-semibold">{e.title}</h3>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1.5"><MapPin className="h-3 w-3" /> {e.location}</p>
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{e.description}</p>
-            </div>
-            <div className="flex items-center">
-              <a href="#" className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"><Calendar className="h-4 w-4" /> Add to calendar</a>
+              <a href="#" className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"><Calendar className="h-4 w-4" /> Add to calendar</a>
             </div>
           </article>
         ))}

@@ -1,40 +1,38 @@
 import { products } from "@/data/marketplace";
-import { useI18n } from "@/i18n/I18nContext";
-import { MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { MapPin, ShoppingBag } from "lucide-react";
 
 export default function ThingsToBuy() {
-  const { t } = useI18n();
   const categories = Array.from(new Set(products.map((p) => p.category)));
 
   return (
     <div className="container mx-auto py-12">
       <header className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">Souvenirs</p>
-        <h1 className="mt-2 font-display text-5xl font-bold">{t("buy_title")}</h1>
-        <p className="mt-4 text-muted-foreground text-lg">{t("buy_intro")}</p>
+        <h1 className="mt-2 font-display text-5xl font-bold">Things to buy in Kanyakumari</h1>
+        <p className="mt-4 text-muted-foreground text-lg">
+          Real local buys from Kanyakumari include seashell craft, palm-leaf articles, wood and bamboo handicrafts, brass idols, banana chips, spices and handloom textiles.
+        </p>
       </header>
 
       {categories.map((cat) => (
         <section key={cat} className="mt-14">
-          <div className="flex items-end justify-between mb-5">
-            <h2 className="font-display text-2xl font-bold">{cat}</h2>
-            <Link to="/marketplace" className="text-sm text-primary hover:underline">{t("view_all")} →</Link>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <h2 className="font-display text-2xl font-bold">{cat}</h2>
+          <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.filter((p) => p.category === cat).map((p) => (
-              <article key={p.id} className="group rounded-2xl bg-card border border-border overflow-hidden shadow-soft hover:shadow-elevated transition-smooth">
-                <div className="aspect-square overflow-hidden bg-muted">
-                  <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover group-hover:scale-110 transition-smooth duration-700" />
+              <article key={p.id} className="group overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-smooth hover:shadow-elevated">
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-smooth duration-700 group-hover:scale-105" />
                 </div>
-                <div className="p-4">
-                  <h3 className="font-medium leading-snug line-clamp-2">{p.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1"><MapPin className="h-3 w-3" /> {p.village}</p>
-                  <div className="mt-3 flex items-center justify-between">
-                    <p className="font-display text-lg font-bold">₹{p.price.toLocaleString()}</p>
-                    <Button size="sm" variant="hero">Buy</Button>
+                <div className="p-5">
+                  <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">
+                    <ShoppingBag className="h-3.5 w-3.5" /> From Rs. {p.price}
                   </div>
+                  <h3 className="mt-2 font-display text-xl font-semibold">{p.name}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+                  <p className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
+                    <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                    <span><span className="font-semibold text-foreground">Where to buy:</span> {p.whereToBuy}</span>
+                  </p>
                 </div>
               </article>
             ))}

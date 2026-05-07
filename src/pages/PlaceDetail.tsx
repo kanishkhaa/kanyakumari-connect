@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Star, Clock, MapPin, Ticket, Sun, Bus, Lightbulb } from "lucide-react";
+import { ArrowLeft, Star, Clock, MapPin, Ticket, Sun, Bus, Lightbulb, ExternalLink } from "lucide-react";
 import { places } from "@/data/places";
 import { Button } from "@/components/ui/button";
 
@@ -22,6 +22,7 @@ export default function PlaceDetail() {
     { icon: Sun, label: "Best time", value: place.bestTime },
     { icon: MapPin, label: "Location", value: place.distance },
   ];
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, Kanyakumari, Tamil Nadu`)}`;
 
   return (
     <article>
@@ -64,6 +65,14 @@ export default function PlaceDetail() {
               <div className="flex items-center gap-2 mb-3 text-secondary"><Bus className="h-5 w-5" /><h3 className="font-semibold">How to reach</h3></div>
               <p className="text-sm text-muted-foreground">{place.howToReach}</p>
               <p className="text-sm mt-3"><span className="font-medium">Nearby bus:</span> {place.nearbyBus}</p>
+              <a
+                href={mapUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                <MapPin className="h-4 w-4" /> View on Google Maps <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
             <div className="p-6 rounded-2xl border border-border">
               <div className="flex items-center gap-2 mb-3 text-primary"><Lightbulb className="h-5 w-5" /><h3 className="font-semibold">Local tips</h3></div>

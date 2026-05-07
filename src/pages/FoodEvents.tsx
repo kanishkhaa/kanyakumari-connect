@@ -40,12 +40,13 @@ export default function FoodEvents() {
         </header>
         <div className="mt-8 grid md:grid-cols-2 gap-5">
           {events.map((e) => (
-            <article key={e.id} className="p-6 rounded-2xl border border-border bg-card hover:border-primary/40 transition-smooth">
-              <div className="flex items-start gap-4">
-                <span className="h-12 w-12 rounded-xl gradient-sunset flex items-center justify-center flex-shrink-0">
-                  <Calendar className="h-6 w-6 text-primary-foreground" />
-                </span>
-                <div>
+            <article key={e.id} className="overflow-hidden rounded-2xl border border-border bg-card hover:border-primary/40 transition-smooth group">
+              <div className="grid sm:grid-cols-[180px_1fr]">
+                <img src={e.image} alt={e.name} loading="lazy" className="h-full min-h-[180px] w-full object-cover transition-smooth duration-700 group-hover:scale-105" />
+                <div className="p-6">
+                  <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl gradient-sunset">
+                    <Calendar className="h-5 w-5 text-primary-foreground" />
+                  </span>
                   <h3 className="font-display text-xl font-semibold">{e.name}</h3>
                   <p className="text-xs text-primary font-medium mt-0.5">{e.month}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {e.location}</p>

@@ -26,7 +26,6 @@ export default function Footer() {
           <h4 className="font-display text-base font-semibold mb-3">Explore</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/places" className="hover:text-primary">Places</Link></li>
-            <li><Link to="/districts" className="hover:text-primary">Regions</Link></li>
             <li><Link to="/itinerary" className="hover:text-primary">Itinerary planner</Link></li>
             <li><Link to="/stays" className="hover:text-primary">Stays</Link></li>
             <li><Link to="/experiences" className="hover:text-primary">Experiences</Link></li>
@@ -50,7 +49,6 @@ export default function Footer() {
           <h4 className="font-display text-base font-semibold mb-3">Discover</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/specialities" className="hover:text-primary">Specialities</Link></li>
-            <li><Link to="/microsites" className="hover:text-primary">Microsites</Link></li>
             <li><Link to="/events" className="hover:text-primary">Events</Link></li>
             <li><Link to="/things-to-buy" className="hover:text-primary">Things to buy</Link></li>
             <li><Link to="/photo-gallery" className="hover:text-primary">Photo gallery</Link></li>

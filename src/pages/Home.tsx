@@ -6,9 +6,8 @@ import PlaceCard from "@/components/PlaceCard";
 import { places } from "@/data/places";
 import { dishes, events } from "@/data/food";
 import { experiences } from "@/data/experiences";
-import { products } from "@/data/marketplace";
 import { stays } from "@/data/stays";
-import { regions, weather, stats } from "@/data/regions";
+import { weather, stats } from "@/data/regions";
 import danceImg from "@/assets/exp-dance.jpg";
 
 export default function Home() {
@@ -23,7 +22,7 @@ export default function Home() {
             { icon: Compass, label: "Where to go", to: "/places" },
             { icon: Calendar, label: "Plan a trip", to: "/itinerary" },
             { icon: Heart, label: "Local experiences", to: "/experiences" },
-            { icon: ShoppingBag, label: "Artisan shop", to: "/marketplace" },
+            { icon: ShoppingBag, label: "Things to buy", to: "/things-to-buy" },
           ].map((a, i) => (
             <Link
               key={a.label}
@@ -43,7 +42,7 @@ export default function Home() {
       </section>
 
       {/* Where to go — Regions */}
-      <section className="container mx-auto py-24 px-4">
+      <section className="hidden">
         <div className="flex items-end justify-between flex-wrap gap-6 mb-12">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">Where to go</p>
@@ -59,27 +58,7 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {regions.map((r) => (
-            <Link
-              key={r.id}
-              to="/places"
-              className="group relative aspect-[3/4] rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-smooth"
-            >
-              <img src={r.image} alt={r.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-smooth duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-ocean-deep via-ocean-deep/40 to-transparent" />
-              <div className="absolute inset-0 p-5 flex flex-col justify-end text-background">
-                <h3 className="font-display text-2xl font-bold drop-shadow">{r.name}</h3>
-                <p className="text-sm text-background/85 mt-1 line-clamp-2">{r.tagline}</p>
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {r.highlights.map((h) => (
-                    <span key={h} className="text-[10px] px-2 py-0.5 rounded-full bg-background/15 backdrop-blur border border-background/30">{h}</span>
-                  ))}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <div />
       </section>
 
       {/* Iconic places */}
@@ -97,7 +76,7 @@ export default function Home() {
       </section>
 
       {/* Experiences editorial */}
-      <section className="container mx-auto py-24 px-4">
+      <section className="hidden">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="relative">
             <img src={danceImg} alt="Folk performance" loading="lazy" className="rounded-2xl shadow-elevated w-full aspect-[4/5] object-cover" />
@@ -270,7 +249,7 @@ export default function Home() {
       </section>
 
       {/* Marketplace */}
-      <section className="container mx-auto py-24 px-4">
+      <section className="hidden">
         <div className="flex items-end justify-between flex-wrap gap-6 mb-12">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">From local hands</p>
@@ -279,7 +258,7 @@ export default function Home() {
           <Button asChild variant="ghost"><Link to="/marketplace">Shop all <ArrowRight className="h-4 w-4" /></Link></Button>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          {products.map((p) => (
+          {([] as Array<{ id: string; name: string; image: string; price: number; category: string }>).map((p) => (
             <Link key={p.id} to="/marketplace" className="group rounded-2xl bg-card overflow-hidden border border-border shadow-soft hover:shadow-elevated transition-smooth">
               <div className="aspect-square overflow-hidden bg-muted">
                 <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover group-hover:scale-110 transition-smooth duration-700" />
@@ -309,13 +288,11 @@ export default function Home() {
             { to: "/operators", label: "Tour Operators" },
             { to: "/dtpc", label: "DTPC Centres" },
             { to: "/ebrochures", label: "eBrochures" },
-            { to: "/microsites", label: "Microsites" },
             { to: "/specialities", label: "Specialities" },
             { to: "/things-to-buy", label: "Things to Buy" },
             { to: "/photo-gallery", label: "Photo Gallery" },
             { to: "/video-gallery", label: "Video Gallery" },
             { to: "/events", label: "Events" },
-            { to: "/districts", label: "Regions" },
             { to: "/faq", label: "FAQ" },
           ].map((s) => (
             <Link key={s.to} to={s.to} className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:shadow-soft transition-smooth text-center">
