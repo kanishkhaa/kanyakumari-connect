@@ -44,39 +44,27 @@ export default function Hospitality() {
     setStatus("Requesting your location...");
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
-        setStatus("Searching OpenStreetMap for nearby emergency services...");
-        const query = `
-          [out:json][timeout:25];
-          (
-            node["amenity"="hospital"](around:10000,${coords.latitude},${coords.longitude});
-            way["amenity"="hospital"](around:10000,${coords.latitude},${coords.longitude});
-            node["amenity"="police"](around:10000,${coords.latitude},${coords.longitude});
-            way["amenity"="police"](around:10000,${coords.latitude},${coords.longitude});
-          );
-          out center tags 20;
-        `;
-        const res = await fetch("https://overpass-api.de/api/interpreter", {
-          method: "POST",
-          body: query,
-        });
-        const json = await res.json();
-        const items = (json.elements || []).map((item: any) => {
-          const lat = item.lat ?? item.center?.lat;
-          const lon = item.lon ?? item.center?.lon;
-          const distance = getDistance(coords.latitude, coords.longitude, lat, lon);
-          return {
+        setStatus("Searching nearby emergency services...");
+        try {
+          const res = await fetch(`/api/nearby?type=emergency&lat=${coords.latitude}&lon=${coords.longitude}`);
+          if (!res.ok) throw new Error("Nearby lookup failed");
+          const json = await res.json();
+          const items = (json.items || []).map((item: any) => ({
             id: item.id,
-            name: item.tags?.name || (item.tags?.amenity === "police" ? "Police station" : "Hospital"),
-            type: item.tags?.amenity === "police" ? "Police" : "Hospital",
-            phone: item.tags?.phone || item.tags?.["contact:phone"],
-            address: [item.tags?.["addr:street"], item.tags?.["addr:city"]].filter(Boolean).join(", "),
-            lat,
-            lon,
-            distance,
-          };
-        }).filter((item: NearbyPlace) => item.lat && item.lon);
-        setNearby(items.length ? items.sort((a: NearbyPlace, b: NearbyPlace) => (a.distance || 0) - (b.distance || 0)) : fallbackNearby);
-        setStatus(items.length ? "Showing nearby OpenStreetMap results." : "No nearby OpenStreetMap results found. Showing Kanyakumari defaults.");
+            name: item.name,
+            type: item.amenity === "police" ? "Police" : "Hospital",
+            phone: item.phone,
+            address: item.address || "",
+            lat: item.lat,
+            lon: item.lon,
+            distance: item.distance,
+          })).filter((item: NearbyPlace) => item.name && item.lat && item.lon);
+          setNearby(items.length ? items.sort((a: NearbyPlace, b: NearbyPlace) => (a.distance || 0) - (b.distance || 0)) : fallbackNearby);
+          setStatus(items.length ? "Showing nearby emergency services." : "No nearby emergency services found. Showing Kanyakumari defaults.");
+        } catch {
+          setNearby(fallbackNearby);
+          setStatus("Emergency lookup failed. Showing Kanyakumari defaults.");
+        }
       },
       () => setStatus("Location permission was not granted. Showing Kanyakumari defaults."),
       { enableHighAccuracy: true, timeout: 10000 },
@@ -142,15 +130,4 @@ export default function Hospitality() {
       </section>
     </div>
   );
-}
-
-function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const r = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }

@@ -22,40 +22,31 @@ export default function FoodEvents() {
     setStatus("Requesting your location...");
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
-        setStatus("Searching OpenStreetMap for nearby restaurants...");
+        setStatus("Searching nearby restaurants...");
         try {
-          const query = `
-            [out:json][timeout:25];
-            (
-              node["amenity"~"restaurant|cafe|fast_food"](around:7000,${coords.latitude},${coords.longitude});
-              way["amenity"~"restaurant|cafe|fast_food"](around:7000,${coords.latitude},${coords.longitude});
-            );
-            out center tags 24;
-          `;
-          const res = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: query });
+          const res = await fetch(`/api/nearby?type=food&lat=${coords.latitude}&lon=${coords.longitude}`);
+          if (!res.ok) throw new Error("Nearby lookup failed");
           const json = await res.json();
-          const items = (json.elements || [])
+          const items = (json.items || [])
             .map((item: any): NearbyRestaurant => {
-              const lat = item.lat ?? item.center?.lat;
-              const lon = item.lon ?? item.center?.lon;
               return {
-                id: `osm-${item.id}`,
-                name: item.tags?.name || "Local food hotel",
-                type: item.tags?.cuisine?.toLowerCase().includes("vegetarian") ? "Veg" : "Multi-cuisine",
-                location: [item.tags?.["addr:street"], item.tags?.["addr:city"]].filter(Boolean).join(", "),
-                lat,
-                lon,
-                phone: item.tags?.phone || item.tags?.["contact:phone"],
+                id: item.id,
+                name: item.name,
+                type: item.cuisine?.toLowerCase().includes("vegetarian") ? "Veg" : "Multi-cuisine",
+                location: item.address || "",
+                lat: item.lat,
+                lon: item.lon,
+                phone: item.phone,
                 rating: 4.1,
-                description: item.tags?.cuisine ? `Cuisine: ${item.tags.cuisine}.` : "",
-                distance: getDistance(coords.latitude, coords.longitude, lat, lon),
+                description: item.cuisine ? `Cuisine: ${item.cuisine}.` : "",
+                distance: item.distance,
                 osm: true,
               };
             })
-            .filter((item: NearbyRestaurant) => item.lat && item.lon)
+            .filter((item: NearbyRestaurant) => item.name && item.lat && item.lon)
             .sort((a: NearbyRestaurant, b: NearbyRestaurant) => (a.distance || 0) - (b.distance || 0));
           setNearby(items.length ? items : restaurants);
-          setStatus(items.length ? "Showing nearby restaurants from OpenStreetMap." : "No nearby OpenStreetMap restaurants found. Showing Kanyakumari favourites.");
+          setStatus(items.length ? "Showing nearby restaurants." : "No nearby restaurants found. Showing Kanyakumari favourites.");
         } catch {
           setNearby(restaurants);
           setStatus("Restaurant lookup failed. Showing Kanyakumari favourites.");
@@ -188,15 +179,4 @@ export default function FoodEvents() {
       </section>
     </div>
   );
-}
-
-function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const r = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
