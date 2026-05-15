@@ -1,11 +1,8 @@
-import vivekanandaImg from "@/assets/place-vivekananda.jpg";
-import thiruvalluvarImg from "@/assets/place-thiruvalluvar.jpg";
 import templeImg from "@/assets/place-temple.jpg";
 import beachImg from "@/assets/place-beach.jpg";
 import palaceImg from "@/assets/place-palace.jpg";
 import waterfallImg from "@/assets/place-waterfall.jpg";
-import vattakottaiImg from "@/assets/place-vattakottai.jpg";
-import aqueductImg from "@/assets/place-aqueduct.jpg";
+import { imageFor, placeImages } from "@/data/imageRegistry";
 
 export type Place = {
   id: string;
@@ -24,6 +21,7 @@ export type Place = {
   howToReach: string;
   nearbyBus: string;
   tips: string[];
+  mapQuery?: string;
 };
 
 const categoryImage: Record<Place["category"], string> = {
@@ -31,17 +29,6 @@ const categoryImage: Record<Place["category"], string> = {
   Heritage: palaceImg,
   Nature: waterfallImg,
   Beach: beachImg,
-};
-
-const placeImage: Record<string, string> = {
-  "vivekananda-rock-memorial": vivekanandaImg,
-  "thiruvalluvar-statue": thiruvalluvarImg,
-  "devi-kanyakumari-temple": templeImg,
-  "kanyakumari-beach": beachImg,
-  "padmanabhapuram-palace": palaceImg,
-  "thirparappu-falls": waterfallImg,
-  "vattakottai-fort": vattakottaiImg,
-  "mathur-aqueduct": aqueductImg,
 };
 
 type PlaceSeed = Omit<Place, "image" | "rating" | "ticket" | "timings" | "bestTime" | "duration" | "howToReach" | "nearbyBus" | "tips"> &
@@ -82,7 +69,7 @@ const makePlace = (place: PlaceSeed, index: number): Place => {
   const defaults = categoryDefaults[place.category];
   return {
     ...place,
-    image: place.image ?? placeImage[place.id] ?? categoryImage[place.category],
+    image: place.image ?? imageFor(placeImages, place.id, categoryImage[place.category]),
     rating: place.rating ?? Number((4.3 + (index % 5) * 0.1).toFixed(1)),
     ticket: place.ticket ?? defaults.ticket,
     timings: place.timings ?? defaults.timings,
@@ -183,6 +170,101 @@ const placeSeeds: PlaceSeed[] = [
     description:
       "The town's iconic seafront is known for sunrise, sunset, full-moon views and the symbolic meeting of three seas at Triveni Sangam.",
     highlights: ["Triveni Sangam", "Sunrise and sunset", "Multi-colored sand", "Temple and memorial access"],
+    tips: ["Arrive 30-45 minutes before sunrise", "Sunset is best from the western-facing viewpoint in clear weather", "Avoid swimming in rough currents"],
+    mapQuery: "Kanyakumari Beach Triveni Sangam Tamil Nadu",
+  },
+  {
+    id: "sunrise-sunset-viewing",
+    name: "Sunrise and Sunset Viewing Points",
+    tagline: "Rare cape views where sunrise, sunset and moonrise can all shape the same journey",
+    category: "Beach",
+    rating: 4.8,
+    ticket: "Free; View Tower may have nominal entry",
+    timings: "Best 5:30 AM - 6:30 AM and 5:15 PM - 6:30 PM by season",
+    bestTime: "October to March; Chitra Pournami for full-moon views",
+    duration: "1-2 hours",
+    distance: "Kanyakumari seafront",
+    description:
+      "Kanyakumari's seafront is famous for sunrise over the Bay of Bengal and sunset toward the Arabian Sea. On clear full-moon evenings, travellers gather for the special sight of sunset and moonrise over the waters.",
+    highlights: ["Sunrise over the three-sea confluence", "Sunset Point", "View Tower angles", "Full-moon Chitra Pournami crowds"],
+    howToReach: "Walk from Kanyakumari town, Beach Road stays, Kumari Amman Temple or the ferry jetty.",
+    nearbyBus: "Kanyakumari bus stand and railway station are close to the main seafront.",
+    tips: ["Check cloud cover before leaving", "Use the View Tower for cleaner sightlines", "Keep extra time on festival and weekend evenings"],
+    mapQuery: "Sunrise View Point Kanyakumari Tamil Nadu",
+  },
+  {
+    id: "poovar-backwater-boating",
+    name: "Backwater Boating near Thengapattinam / Poovar Route",
+    tagline: "Slow boat rides where river, backwater and sea landscapes meet",
+    category: "Nature",
+    rating: 4.5,
+    ticket: "Boat charges vary by operator",
+    timings: "Daylight hours; morning and late afternoon are best",
+    bestTime: "October to March",
+    duration: "1-2 hours",
+    distance: "Around 45-55 km from Kanyakumari depending on jetty",
+    description:
+      "The western coast near Thengapattinam and the Poovar backwater route offers calm boating through estuary scenery, coconut-fringed channels and fishing-village landscapes.",
+    highlights: ["Estuary scenery", "Backwater boat rides", "Fishing village views", "Golden-hour photography"],
+    howToReach: "Book a taxi from Kanyakumari or Nagercoil toward Thengapattinam or the Poovar backwater jetties.",
+    nearbyBus: "Thengapattinam and nearby coastal towns have bus links from Nagercoil.",
+    tips: ["Confirm life jackets before boarding", "Negotiate route and duration first", "Avoid boating during heavy rain or rough wind"],
+    mapQuery: "Thengapattinam backwater boating Kanyakumari Tamil Nadu",
+  },
+  {
+    id: "mayiladi-kal-sirpangal",
+    name: "Mayiladi Kal Sirpangal (Stone Sculpture Workshops)",
+    tagline: "Traditional stone carving cluster known for temple icons and granite craft",
+    category: "Heritage",
+    ticket: "Free to visit workshops; purchases vary",
+    timings: "Usually working daylight hours",
+    bestTime: "Morning, when workshops are active",
+    duration: "1 hour",
+    distance: "Around 10-12 km from Kanyakumari",
+    description:
+      "Mayiladi is associated with skilled stone sculptors who carve temple icons, pillars and decorative forms. A visit gives travellers a close look at the patient handwork behind Tamil stone sculpture traditions.",
+    highlights: ["Granite carving workshops", "Temple icon craft", "Meet local artisans", "Souvenir and commission options"],
+    howToReach: "Reach Mayiladi by taxi, auto or local bus from Kanyakumari or Nagercoil.",
+    nearbyBus: "Mayiladi bus stops connect with Kanyakumari and Nagercoil routes.",
+    tips: ["Ask before photographing artisans", "Buy directly from verified workshops", "Carry cash for small purchases"],
+    mapQuery: "Mayiladi stone sculpture Kanyakumari Tamil Nadu",
+  },
+  {
+    id: "deventhra-malai",
+    name: "Deventhra Malai",
+    tagline: "Quiet hill-country detour for views, village roads and green air",
+    category: "Nature",
+    ticket: "Free",
+    timings: "Daylight hours recommended",
+    bestTime: "Post-monsoon and winter",
+    duration: "1-2 hours",
+    distance: "Interior Kanyakumari district",
+    description:
+      "Deventhra Malai is a lesser-known hill stop suited to travellers who want a quiet rural viewpoint away from the main seafront circuit. The appeal is the approach road, greenery and slower village rhythm.",
+    highlights: ["Hill views", "Rural landscape", "Quiet nature stop", "Photography at golden hour"],
+    howToReach: "Use a local taxi from Nagercoil or Kanyakumari and confirm the exact access route with residents.",
+    nearbyBus: "Nearest bus access depends on the chosen approach village.",
+    tips: ["Travel with a local driver", "Avoid isolated hill roads after dark", "Carry water and basic snacks"],
+    mapQuery: "Deventhra Malai Kanyakumari Tamil Nadu",
+  },
+  {
+    id: "kumarakovil",
+    name: "Kumarakovil / Velimalai Murugan Temple",
+    tagline: "Ancient Murugan shrine at the foot of Velimalai",
+    category: "Spiritual",
+    rating: 4.7,
+    ticket: "Free entry",
+    timings: "Morning and evening temple hours",
+    bestTime: "Festival days and early morning",
+    duration: "1-2 hours",
+    distance: "Around 35 km from Kanyakumari",
+    description:
+      "Kumarakovil is a revered Murugan temple set against the Velimalai landscape. It is known for its scenic setting, long-standing devotional traditions and a calm atmosphere outside peak festival periods.",
+    highlights: ["Murugan temple", "Velimalai backdrop", "Temple festivals", "Peaceful hill-foot setting"],
+    howToReach: "Reach by road from Nagercoil, Thuckalay or Kanyakumari using bus, taxi or auto connections.",
+    nearbyBus: "Kumarakovil bus stop is close to the temple approach.",
+    tips: ["Dress modestly", "Check festival crowd days", "Combine with Padmanabhapuram Palace or nearby heritage stops"],
+    mapQuery: "Kumarakovil Murugan Temple Velimalai Kanyakumari",
   },
   {
     id: "wandering-monk-museum",

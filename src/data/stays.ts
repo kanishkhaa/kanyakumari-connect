@@ -1,6 +1,5 @@
-import homestayImg from "@/assets/stay-homestay.jpg";
-import ecoImg from "@/assets/stay-ecolodge.jpg";
-import hotelImg from "@/assets/stay-hotel.jpg";
+import { imageFor, stayImages } from "@/data/imageRegistry";
+import stayPlaceholder from "@/assets/stay-hotel.jpg";
 
 export type Stay = {
   id: string;
@@ -16,61 +15,75 @@ export type Stay = {
   description: string;
 };
 
+const makeStay = (stay: Omit<Stay, "image"> & { image?: string }): Stay => ({
+  ...stay,
+  image: stay.image ?? imageFor(stayImages, stay.id, stayPlaceholder),
+});
+
 export const stays: Stay[] = [
-  {
-    id: "sea-breeze-homestay",
-    name: "Sea Breeze Homestay",
-    type: "Homestay",
-    image: homestayImg,
-    location: "Kovalam Road, Kanyakumari",
-    pricePerNight: 1800,
-    rating: 4.7,
-    reviews: 142,
-    amenities: ["Sea view", "Home-cooked meals", "Free WiFi", "Family run"],
-    verified: true,
-    description:
-      "Run by the Pillai family for over 20 years. Wake up to the sound of waves and home-cooked Tamil breakfast on the rooftop.",
-  },
-  {
-    id: "palmyra-eco-lodge",
-    name: "Palmyra Eco Lodge",
-    type: "Eco Lodge",
-    image: ecoImg,
-    location: "Muttom Beach, 12 km from Kanyakumari",
-    pricePerNight: 2500,
-    rating: 4.8,
-    reviews: 89,
-    amenities: ["Solar powered", "Organic farm", "Bicycle hire", "Yoga deck"],
-    verified: true,
-    description:
-      "Thatched cottages built with palmyra and coconut wood. Zero plastic, rainwater harvested, organic meals from the on-site farm.",
-  },
-  {
-    id: "sangam-beach-resort",
-    name: "Sangam Beach Resort",
+  makeStay({
+    id: "annai-resorts-spa",
+    name: "Annai Resorts & Spa",
     type: "Hotel",
-    image: hotelImg,
-    location: "Beach Road, Kanyakumari",
-    pricePerNight: 4200,
+    location: "Kovalam Road, Kanyakumari",
+    pricePerNight: 5200,
+    rating: 4.6,
+    reviews: 1240,
+    amenities: ["Sea view villas", "Pool", "Spa", "Restaurant"],
+    verified: true,
+    description:
+      "A well-known resort close to the seafront with sea-facing rooms and easy access to sunrise, sunset and ferry attractions.",
+  }),
+  makeStay({
+    id: "sparsa-resorts-kanyakumari",
+    name: "Sparsa Resorts Kanyakumari",
+    type: "Eco Lodge",
+    location: "Beach Road near Sunset Point, Kanyakumari",
+    pricePerNight: 4800,
     rating: 4.5,
-    reviews: 318,
-    amenities: ["Pool", "AC rooms", "Restaurant", "Sunrise balcony"],
+    reviews: 980,
+    amenities: ["Ocean views", "Eco-friendly", "Restaurant", "Parking"],
     verified: true,
     description:
-      "Mid-range beachfront hotel with private balconies facing the Bay of Bengal. Walking distance to Vivekananda ferry.",
-  },
-  {
-    id: "kani-tribal-stay",
-    name: "Kani Tribal Village Stay",
-    type: "Tribal Stay",
-    image: ecoImg,
-    location: "Pechiparai foothills, 50 km from Kanyakumari",
-    pricePerNight: 1500,
-    rating: 4.9,
-    reviews: 47,
-    amenities: ["Forest trek", "Tribal cuisine", "Cultural night", "Guided"],
+      "A popular resort near the ocean and sunset viewing area, known for comfortable rooms and proximity to the main town sights.",
+  }),
+  makeStay({
+    id: "hotel-sea-view",
+    name: "Hotel Sea View",
+    type: "Hotel",
+    location: "East Car Street / Beach area, Kanyakumari",
+    pricePerNight: 3600,
+    rating: 4.3,
+    reviews: 860,
+    amenities: ["Sea-facing rooms", "Restaurant", "Family rooms", "Walkable location"],
     verified: true,
     description:
-      "Stay with the Kani tribal community in the Western Ghats. Includes guided forest walks, herbal medicine demos and traditional kanji dinner.",
-  },
+      "A central hotel option for travellers who want quick access to Kumari Amman Temple, the ferry point and beach viewpoints.",
+  }),
+  makeStay({
+    id: "hotel-temple-citi",
+    name: "Hotel Temple Citi",
+    type: "Hotel",
+    location: "Near Kanyakumari Temple and railway station",
+    pricePerNight: 2400,
+    rating: 4.2,
+    reviews: 640,
+    amenities: ["Family rooms", "Restaurant", "Parking", "Budget friendly"],
+    verified: true,
+    description:
+      "A popular town hotel for temple visits, short stays and budget-conscious families who prefer central access.",
+  }),
+  makeStay({
+    id: "hotel-sangam",
+    name: "Hotel Sangam",
+    type: "Hotel",
+    location: "Main Road, Kanyakumari",
+    pricePerNight: 3000,
+    rating: 4.2,
+    reviews: 710,
+    amenities: ["Restaurant", "AC rooms", "Central location", "Travel desk"],
+    verified: true,
+    description:
+      "A long-running hotel choice in Kanyakumari town with convenient road access to beaches, ferry services and local shopping.",
+  }),
 ];

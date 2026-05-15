@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { events } from "@/data/events";
+import { events as fallbackEvents } from "@/data/events";
+import { useCollection } from "@/hooks/useCollection";
 import { useI18n } from "@/i18n/I18nContext";
 import { Calendar, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ const cats = ["All", "Festival", "Cultural", "Spiritual", "Fair"] as const;
 export default function Events() {
   const { t } = useI18n();
   const [cat, setCat] = useState<(typeof cats)[number]>("All");
+  const { data: events } = useCollection("events", fallbackEvents);
   const list = cat === "All" ? events : events.filter((e) => e.category === cat);
 
   return (

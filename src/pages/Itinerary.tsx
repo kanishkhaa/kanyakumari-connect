@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Bus, Calendar, Car, CloudSun, Compass, Hotel, MapPin, Sparkles, Train, Wallet } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Bus, Calendar, Car, CloudSun, Compass, MapPin, Navigation, Sparkles, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { places } from "@/data/places";
@@ -9,7 +9,7 @@ import { events } from "@/data/events";
 
 type Interest = "Spiritual" | "Nature" | "Heritage" | "Food" | "Beach";
 type Pace = "Relaxed" | "Balanced" | "Packed";
-type TravelMode = "Cab" | "Bus" | "Train";
+type TravelMode = "Cab" | "Bus";
 
 const INTERESTS: Interest[] = ["Spiritual", "Nature", "Heritage", "Food", "Beach"];
 const monthWeather = [
@@ -28,10 +28,24 @@ const monthWeather = [
 ];
 
 const howToReach = [
-  { icon: CloudSun, mode: "Air", text: "Nearest major airport is Thiruvananthapuram, around 90 km away." },
-  { icon: Train, mode: "Rail", text: "Kanyakumari Railway Station connects the town with many Indian cities." },
-  { icon: Bus, mode: "Road", text: "Road links connect Kanyakumari with Nagercoil, Madurai, Tirunelveli and Thiruvananthapuram." },
+  {
+    icon: Bus,
+    mode: "Road",
+    text:
+      "Kanyakumari is well connected by road through Nagercoil, Tirunelveli, Madurai and Thiruvananthapuram. TNSTC and SETC buses operate regular services to Kanyakumari, with Nagercoil as the strongest district hub for onward local buses.",
+  },
 ];
+
+type LiveWeather = {
+  status: string;
+  place: string;
+  temperature?: number;
+  feelsLike?: number;
+  humidity?: number;
+  wind?: number;
+  code?: number;
+  forecast?: Array<{ date: string; max: number; min: number; rain: number; code: number }>;
+};
 
 function pickPlaces(interests: Interest[], count: number) {
   const matched = places.filter((p) => interests.includes(p.category as Interest));
@@ -66,11 +80,15 @@ export default function Itinerary() {
   const [travelMode, setTravelMode] = useState<TravelMode>("Cab");
   const [interests, setInterests] = useState<Interest[]>(["Spiritual", "Heritage", "Beach"]);
   const [generated, setGenerated] = useState(false);
+  const [liveWeather, setLiveWeather] = useState<LiveWeather>({
+    status: "Detecting your location for live weather...",
+    place: "Your location",
+  });
 
   const plan = useMemo(() => buildDayPlan(days, interests, pace), [days, interests, pace]);
   const chosenWeather = monthWeather.find((w) => w.month === month) ?? monthWeather[9];
   const perDayBudget = Math.round(budget / days);
-  const transportCost = travelMode === "Cab" ? 2200 : travelMode === "Bus" ? 300 : 700;
+  const transportCost = travelMode === "Cab" ? 2200 : 300;
   const stayCost = Math.round(perDayBudget * 0.45);
   const foodCost = Math.round(perDayBudget * 0.25);
   const activityCost = Math.max(perDayBudget - stayCost - foodCost - transportCost, 0);
@@ -80,6 +98,64 @@ export default function Itinerary() {
       current.includes(interest) ? current.filter((item) => item !== interest) : [...current, interest],
     );
   };
+
+  const loadWeather = (coords?: GeolocationCoordinates) => {
+    const lat = coords?.latitude ?? 8.0883;
+    const lon = coords?.longitude ?? 77.5385;
+    const place = coords ? "Your current location" : "Kanyakumari fallback";
+    setLiveWeather((current) => ({ ...current, status: "Loading live weather...", place }));
+
+    const url = new URL("https://api.open-meteo.com/v1/forecast");
+    url.searchParams.set("latitude", String(lat));
+    url.searchParams.set("longitude", String(lon));
+    url.searchParams.set("current", "temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m");
+    url.searchParams.set("daily", "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max");
+    url.searchParams.set("forecast_days", "4");
+    url.searchParams.set("timezone", "auto");
+
+    fetch(url.toString())
+      .then((res) => {
+        if (!res.ok) throw new Error("Weather request failed");
+        return res.json();
+      })
+      .then((data) => {
+        setLiveWeather({
+          status: "Live weather from Open-Meteo",
+          place,
+          temperature: Math.round(data.current?.temperature_2m),
+          feelsLike: Math.round(data.current?.apparent_temperature),
+          humidity: data.current?.relative_humidity_2m,
+          wind: Math.round(data.current?.wind_speed_10m),
+          code: data.current?.weather_code,
+          forecast: (data.daily?.time || []).map((date: string, index: number) => ({
+            date,
+            max: Math.round(data.daily.temperature_2m_max[index]),
+            min: Math.round(data.daily.temperature_2m_min[index]),
+            rain: data.daily.precipitation_probability_max[index],
+            code: data.daily.weather_code[index],
+          })),
+        });
+      })
+      .catch(() => {
+        setLiveWeather({
+          status: "Live weather unavailable. Showing seasonal Kanyakumari guide below.",
+          place,
+        });
+      });
+  };
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      loadWeather();
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => loadWeather(coords),
+      () => loadWeather(),
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  }, []);
 
   return (
     <div className="bg-[#f8f7f2]">
@@ -179,7 +255,6 @@ export default function Itinerary() {
                     <select value={travelMode} onChange={(e) => setTravelMode(e.target.value as TravelMode)} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm">
                       <option>Cab</option>
                       <option>Bus</option>
-                      <option>Train</option>
                     </select>
                   </label>
                 </div>
@@ -192,7 +267,7 @@ export default function Itinerary() {
               <div className="space-y-6">
                 <div className="grid md:grid-cols-4 gap-4">
                   {[
-                    ["Weather", `${chosenWeather.temp}`, chosenWeather.note],
+                    ["Weather", liveWeather.temperature !== undefined ? `${liveWeather.temperature}°C now` : `${chosenWeather.temp}`, liveWeather.temperature !== undefined ? weatherLabel(liveWeather.code) : chosenWeather.note],
                     ["Stay/day", `Rs. ${stayCost.toLocaleString()}`, "Hotel or homestay estimate"],
                     ["Food/day", `Rs. ${foodCost.toLocaleString()}`, "Meals and snacks"],
                     ["Activities/day", `Rs. ${activityCost.toLocaleString()}`, "Tickets, ferry, local stops"],
@@ -253,6 +328,55 @@ export default function Itinerary() {
           </TabsContent>
 
           <TabsContent value="weather" className="mt-8">
+            <section className="mb-8 bg-white p-6 shadow-soft">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Live weather</p>
+                  <h2 className="mt-1 font-display text-3xl font-bold">{liveWeather.place}</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">{liveWeather.status}</p>
+                </div>
+                <Button variant="hero" onClick={() => {
+                  if (!navigator.geolocation) {
+                    loadWeather();
+                    return;
+                  }
+                  navigator.geolocation.getCurrentPosition(({ coords }) => loadWeather(coords), () => loadWeather(), { enableHighAccuracy: true, timeout: 10000 });
+                }}>
+                  <Navigation className="h-4 w-4" /> Refresh location
+                </Button>
+              </div>
+
+              {liveWeather.temperature !== undefined && (
+                <>
+                  <div className="mt-6 grid sm:grid-cols-4 gap-4">
+                    {[
+                      ["Now", `${liveWeather.temperature}°C`, weatherLabel(liveWeather.code)],
+                      ["Feels like", `${liveWeather.feelsLike}°C`, "Apparent temperature"],
+                      ["Humidity", `${liveWeather.humidity}%`, "Relative humidity"],
+                      ["Wind", `${liveWeather.wind} km/h`, "10 m wind speed"],
+                    ].map(([label, value, note]) => (
+                      <div key={label} className="border border-border p-4">
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
+                        <p className="mt-1 font-display text-2xl font-bold">{value}</p>
+                        <p className="text-xs text-muted-foreground">{note}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {liveWeather.forecast?.map((day) => (
+                      <div key={day.date} className="border border-border p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-primary">{formatForecastDate(day.date)}</p>
+                        <p className="mt-1 font-display text-xl font-bold">{day.min}°C / {day.max}°C</p>
+                        <p className="text-sm text-muted-foreground">{weatherLabel(day.code)}</p>
+                        <p className="text-xs text-muted-foreground">Rain chance {day.rain ?? 0}%</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </section>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {monthWeather.map((w) => (
                 <button key={w.month} onClick={() => setMonth(w.month)} className={`bg-white p-5 text-left shadow-soft ${month === w.month ? "ring-2 ring-[#1f5f3b]" : ""}`}>
@@ -266,7 +390,7 @@ export default function Itinerary() {
           </TabsContent>
 
           <TabsContent value="reach" className="mt-8">
-            <div className="grid md:grid-cols-3 gap-5">
+            <div className="grid gap-5">
               {howToReach.map((item) => (
                 <div key={item.mode} className="bg-white p-6 shadow-soft">
                   <item.icon className="h-8 w-8 text-primary" />
@@ -279,9 +403,9 @@ export default function Itinerary() {
               <h2 className="font-display text-2xl font-bold">Local transport</h2>
               <div className="mt-4 grid md:grid-cols-3 gap-4">
                 {[
-                  [Car, "Cab / taxi", "Best for Padmanabhapuram, Thirparappu, Mathur and Pechiparai day trips."],
-                  [Bus, "TNSTC buses", "Budget option for Nagercoil, Suchindram and several district routes."],
-                  [Train, "Rail", "Useful for arrival and onward travel; Kanyakumari is a major rail terminus."],
+                  [Bus, "TNSTC town and mofussil buses", "Use Kanyakumari Bus Stand for town access and Nagercoil/Vadasery bus stand for stronger district connections."],
+                  [Bus, "Key TNSTC road routes", "Frequent buses connect Kanyakumari with Nagercoil, Suchindram, Marthandam, Thuckalay, Tirunelveli and Madurai."],
+                  [Car, "Cab / taxi", "Best for Padmanabhapuram Palace, Thirparappu Falls, Mathur Aqueduct, Pechiparai and multi-stop day trips."],
                 ].map(([Icon, title, text]) => {
                   const TransportIcon = Icon as typeof Car;
                   return (
@@ -329,4 +453,19 @@ export default function Itinerary() {
       </section>
     </div>
   );
+}
+
+function weatherLabel(code?: number) {
+  if (code === undefined) return "Live conditions";
+  if (code === 0) return "Clear sky";
+  if ([1, 2, 3].includes(code)) return "Partly cloudy";
+  if ([45, 48].includes(code)) return "Fog";
+  if ([51, 53, 55, 56, 57].includes(code)) return "Drizzle";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "Rain likely";
+  if ([95, 96, 99].includes(code)) return "Thunderstorm risk";
+  return "Cloudy";
+}
+
+function formatForecastDate(date: string) {
+  return new Intl.DateTimeFormat("en-IN", { weekday: "short", day: "numeric", month: "short" }).format(new Date(date));
 }

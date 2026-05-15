@@ -16,6 +16,61 @@ export type Dish = {
   description: string;
 };
 
+export type Restaurant = {
+  id: string;
+  name: string;
+  type: "Veg" | "Non-Veg" | "Multi-cuisine" | "Cafe";
+  location: string;
+  lat: number;
+  lon: number;
+  phone?: string;
+  rating: number;
+  description: string;
+};
+
+export const restaurants: Restaurant[] = [
+  {
+    id: "sea-view-restaurant",
+    name: "Sea View Restaurant",
+    type: "Multi-cuisine",
+    location: "Hotel Sea View, Kanyakumari beach area",
+    lat: 8.0882,
+    lon: 77.5482,
+    rating: 4.3,
+    description: "Known for central beach access, sea-facing ambience and South Indian, North Indian and seafood options.",
+  },
+  {
+    id: "arafa-restaurant",
+    name: "Arafa Restaurant",
+    type: "Multi-cuisine",
+    location: "Kanyakumari town",
+    lat: 8.0877,
+    lon: 77.5465,
+    rating: 4.2,
+    description: "A popular casual dining choice for South Indian, North Indian and Arabian-style dishes.",
+  },
+  {
+    id: "saravana-bhavan-kanyakumari",
+    name: "Saravana Bhavan",
+    type: "Veg",
+    location: "Near Kanyakumari temple and beach circuit",
+    lat: 8.0889,
+    lon: 77.5469,
+    rating: 4.1,
+    description: "A familiar vegetarian stop for tiffin, meals, coffee and family-friendly quick dining.",
+  },
+  {
+    id: "prabhu-hotel-nagercoil",
+    name: "Prabhu Hotel",
+    type: "Non-Veg",
+    location: "Nagercoil",
+    lat: 8.1833,
+    lon: 77.4119,
+    rating: 4.4,
+    description: "A local Nagercoil favourite often recommended for parotta and non-vegetarian meals.",
+  },
+];
+
 export const dishes: Dish[] = [
   {
     id: "meen-kuzhambu",

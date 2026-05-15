@@ -1,10 +1,12 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Star, Clock, MapPin, Ticket, Sun, Bus, Lightbulb, ExternalLink } from "lucide-react";
-import { places } from "@/data/places";
+import { places as fallbackPlaces } from "@/data/places";
+import { useCollection } from "@/hooks/useCollection";
 import { Button } from "@/components/ui/button";
 
 export default function PlaceDetail() {
   const { id } = useParams();
+  const { data: places } = useCollection("places", fallbackPlaces);
   const place = places.find((p) => p.id === id);
 
   if (!place) {
@@ -22,7 +24,7 @@ export default function PlaceDetail() {
     { icon: Sun, label: "Best time", value: place.bestTime },
     { icon: MapPin, label: "Location", value: place.distance },
   ];
-  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, Kanyakumari, Tamil Nadu`)}`;
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.mapQuery ?? `${place.name}, Kanyakumari, Tamil Nadu`)}`;
 
   return (
     <article>

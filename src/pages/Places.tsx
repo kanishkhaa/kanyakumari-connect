@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { places } from "@/data/places";
+import { places as fallbackPlaces } from "@/data/places";
+import { useCollection } from "@/hooks/useCollection";
 import PlaceCard from "@/components/PlaceCard";
 import { Search } from "lucide-react";
 
@@ -8,6 +9,7 @@ const categories = ["All", "Spiritual", "Heritage", "Nature", "Beach"] as const;
 export default function Places() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
+  const { data: places } = useCollection("places", fallbackPlaces);
 
   const filtered = useMemo(() => {
     return places.filter((p) => {

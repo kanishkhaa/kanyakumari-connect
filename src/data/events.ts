@@ -1,8 +1,5 @@
-import templeImg from "@/assets/place-temple.jpg";
-import beachImg from "@/assets/place-beach.jpg";
-import vivekanandaImg from "@/assets/place-vivekananda.jpg";
-import danceImg from "@/assets/exp-dance.jpg";
-import palaceImg from "@/assets/place-palace.jpg";
+import { eventImages, imageFor } from "@/data/imageRegistry";
+import placePlaceholder from "@/assets/place-beach.jpg";
 
 export type EventItem = {
   id: string;
@@ -17,37 +14,37 @@ export type EventItem = {
 
 export const events: EventItem[] = [
   {
-    id: "vaisakhi-festival",
-    title: "Vaisakhi Festival at Kumari Amman Temple",
-    date: "May / June",
-    month: "May",
-    location: "Kumari Amman Temple, Kanyakumari",
+    id: "suchindram-margazhi-car-festival",
+    title: "Suchindram Margazhi Car Festival",
+    date: "December / January",
+    month: "January",
+    location: "Thanumalayan Temple, Suchindram",
     category: "Spiritual",
-    image: templeImg,
+    image: imageFor(eventImages, "suchindram-margazhi-car-festival", placePlaceholder),
     description:
-      "The temple's important annual festival is celebrated for 10 days, with the utsava idol of Goddess Kumari taken in processions.",
+      "The famous 10-day Margazhi festival at Suchindram features temple processions and the car festival that draws devotees from across Kanyakumari district.",
   },
   {
-    id: "navaratri",
-    title: "Navaratri at Kumari Amman Temple",
-    date: "September / October",
-    month: "Sep-Oct",
-    location: "Kumari Amman Temple and Kanyakumari town",
-    category: "Festival",
-    image: templeImg,
-    description:
-      "Nine nights of Devi worship, music, processions and temple visits. Incredible India lists Navratri among Kanyakumari's key fairs and festivals.",
-  },
-  {
-    id: "cape-festival",
-    title: "Cape Festival",
-    date: "October",
-    month: "October",
-    location: "Kanyakumari seafront / Triveni Sangam",
+    id: "thai-pongal-coastal-harvest",
+    title: "Thai Pongal and Coastal Harvest Celebrations",
+    date: "Mid-January / February village follow-ups",
+    month: "February",
+    location: "Villages across Kanyakumari district",
     category: "Cultural",
-    image: beachImg,
+    image: imageFor(eventImages, "thai-pongal-coastal-harvest", placePlaceholder),
     description:
-      "A three-day cultural celebration of Kanyakumari's beauty and culture, with music, dance and visitors gathering near the three-sea confluence.",
+      "Pongal season continues through community gatherings, temple visits and harvest-linked village observances, especially in agrarian and coastal settlements.",
+  },
+  {
+    id: "mahashivaratri-temple-night",
+    title: "Maha Shivaratri Temple Night",
+    date: "February / March",
+    month: "March",
+    location: "Suchindram, Guganathaswamy Temple and district Shiva shrines",
+    category: "Spiritual",
+    image: imageFor(eventImages, "mahashivaratri-temple-night", placePlaceholder),
+    description:
+      "Night-long Shiva worship, special pujas and devotional music are observed at major Shiva shrines, with Suchindram among the important stops.",
   },
   {
     id: "chitra-pournami",
@@ -56,41 +53,96 @@ export const events: EventItem[] = [
     month: "April",
     location: "Kanyakumari Beach and View Tower",
     category: "Festival",
-    image: vivekanandaImg,
+    image: imageFor(eventImages, "chitra-pournami", placePlaceholder),
     description:
-      "A popular full-moon occasion for watching the cape's rare sunset and moonrise views over the water, one of Kanyakumari's most loved seasonal experiences.",
+      "Travellers gather at the cape to watch the rare seasonal spectacle of sunset and moonrise over the waters during the Chitra Pournami full moon.",
   },
   {
-    id: "car-festival",
-    title: "Car Festival",
-    date: "Temple calendar",
-    month: "Varies",
+    id: "vaisakhi-kumari-amman",
+    title: "Vaisakhi Festival at Kumari Amman Temple",
+    date: "May / June",
+    month: "May",
     location: "Kumari Amman Temple, Kanyakumari",
     category: "Spiritual",
-    image: danceImg,
+    image: imageFor(eventImages, "vaisakhi-kumari-amman", placePlaceholder),
     description:
-      "One of the important Kumari Amman Temple observances, associated with processions and devotional gatherings around the temple streets.",
+      "One of the temple's major annual festivals, celebrated over multiple days with special rituals and processions of the utsava idol of Goddess Kumari.",
   },
   {
-    id: "kalabham-festival",
-    title: "Kalabham Sandal Festival",
-    date: "Temple calendar",
-    month: "Varies",
-    location: "Kumari Amman Temple, Kanyakumari",
-    category: "Spiritual",
-    image: templeImg,
-    description:
-      "A sandal-paste festival listed among the temple's important observances, drawing devotees to special rituals at the ancient shrine.",
-  },
-  {
-    id: "navaratri-procession",
-    title: "Padmanabhapuram Navaratri Procession",
-    date: "September / October",
-    month: "Sep-Oct",
-    location: "Padmanabhapuram Palace route",
+    id: "southwest-monsoon-waterfall-season",
+    title: "Monsoon Waterfall Season",
+    date: "June",
+    month: "June",
+    location: "Thirparappu Falls and Western Ghats foothills",
     category: "Cultural",
-    image: palaceImg,
+    image: imageFor(eventImages, "southwest-monsoon-waterfall-season", placePlaceholder),
     description:
-      "A historic Navaratri-linked procession tradition connects Padmanabhapuram with the wider Travancore cultural route during the festival season.",
+      "The southwest monsoon refreshes Kanyakumari's hill routes and waterfalls. Visitors plan cautious day trips to Thirparappu, Kalikesam and reservoir landscapes.",
+  },
+  {
+    id: "kalabham-sandal-festival",
+    title: "Kalabham Sandal Festival",
+    date: "Temple calendar, often monsoon season",
+    month: "July",
+    location: "Kumari Amman Temple, Kanyakumari",
+    category: "Spiritual",
+    image: imageFor(eventImages, "kalabham-sandal-festival", placePlaceholder),
+    description:
+      "A sandal-paste festival listed among Kumari Amman Temple's important observances, drawing devotees for special adornment and worship rituals.",
+  },
+  {
+    id: "adi-amman-observances",
+    title: "Aadi Amman Observances",
+    date: "July / August",
+    month: "August",
+    location: "Amman temples across Kanyakumari district",
+    category: "Festival",
+    image: imageFor(eventImages, "adi-amman-observances", placePlaceholder),
+    description:
+      "Aadi season brings special Amman worship, community offerings and local temple gatherings across the district's villages and coastal towns.",
+  },
+  {
+    id: "onam-padmanabhapuram-cultural-season",
+    title: "Onam and Travancore Heritage Season",
+    date: "August / September",
+    month: "September",
+    location: "Padmanabhapuram Palace, Thuckalay and Nagercoil belt",
+    category: "Cultural",
+    image: imageFor(eventImages, "onam-padmanabhapuram-cultural-season", placePlaceholder),
+    description:
+      "Kanyakumari's historic Travancore links are visible during Onam season, especially around Padmanabhapuram, Thuckalay and Kerala-border communities.",
+  },
+  {
+    id: "navaratri-kumari-amman",
+    title: "Navaratri at Kumari Amman Temple",
+    date: "September / October",
+    month: "October",
+    location: "Kumari Amman Temple and Kanyakumari town",
+    category: "Festival",
+    image: imageFor(eventImages, "navaratri-kumari-amman", placePlaceholder),
+    description:
+      "Nine nights of Devi worship, music and processions make Navaratri one of the most important festival windows for Kanyakumari pilgrims.",
+  },
+  {
+    id: "cape-festival",
+    title: "Cape Festival",
+    date: "October / November",
+    month: "November",
+    location: "Kanyakumari seafront and Triveni Sangam",
+    category: "Cultural",
+    image: imageFor(eventImages, "cape-festival", placePlaceholder),
+    description:
+      "A cultural celebration of the cape with music, dance and public programmes near the three-sea confluence, traditionally promoted as a signature Kanyakumari festival.",
+  },
+  {
+    id: "christmas-coastal-celebrations",
+    title: "Christmas and Year-End Coastal Celebrations",
+    date: "December",
+    month: "December",
+    location: "Our Lady of Ransom Church and coastal parishes",
+    category: "Festival",
+    image: imageFor(eventImages, "christmas-coastal-celebrations", placePlaceholder),
+    description:
+      "Kanyakumari's coastal churches, especially Our Lady of Ransom near the shore, become focal points for Christmas services, lights and community gatherings.",
   },
 ];
