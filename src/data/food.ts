@@ -1,7 +1,11 @@
 import thaliImg from "@/assets/food-thali.jpg";
 import fishImg from "@/assets/food-fishcurry.jpg";
 import appamImg from "@/assets/food-appam.jpg";
-import chipsImg from "@/assets/market-spices.jpg";
+import idiyappamImg from "@/assets/food-idiyappam.jpg";
+import chipsImg from "@/assets/food-bananachips.jpeg";
+import juiceImg from "@/assets/food-juice.jpg";
+import kothuParottaImg from "@/assets/food-kothuparotta.jpg";
+import bakeryImg from "@/assets/food-bakery.jpg";
 import beachImg from "@/assets/place-beach.jpg";
 import danceImg from "@/assets/exp-dance.jpg";
 import templeImg from "@/assets/place-temple.jpg";
@@ -85,7 +89,7 @@ export const dishes: Dish[] = [
   {
     id: "kothu-parotta",
     name: "Kothu Parotta",
-    image: thaliImg,
+    image: kothuParottaImg,
     type: "Non-Veg",
     priceRange: "Rs. 90 - Rs. 180",
     whereToTry: "Evening street-food stalls in Kanyakumari and Nagercoil",
@@ -105,7 +109,7 @@ export const dishes: Dish[] = [
   {
     id: "idiyappam-puttu",
     name: "Idiyappam and Puttu",
-    image: appamImg,
+    image: idiyappamImg,
     type: "Veg",
     priceRange: "Rs. 70 - Rs. 150",
     whereToTry: "Morning tiffin shops in Nagercoil and Kanyakumari town",
@@ -125,12 +129,22 @@ export const dishes: Dish[] = [
   {
     id: "palm-fruit-juice",
     name: "Palm Fruit Juice / Nungu Drinks",
-    image: beachImg,
+    image: juiceImg,
     type: "Veg",
     priceRange: "Rs. 40 - Rs. 100",
     whereToTry: "Seasonal juice stalls and market areas",
     description:
       "Refreshing palm fruit drinks are a local summer favorite and a good match for Kanyakumari's hot coastal afternoons.",
+  },
+  {
+    id: "local-bakery",
+    name: "Local Bakery Snacks",
+    image: bakeryImg,
+    type: "Veg",
+    priceRange: "Rs. 40 - Rs. 160",
+    whereToTry: "Town bakeries, tea shops and market streets in Kanyakumari and Nagercoil",
+    description:
+      "Fresh bakery snacks and tea-time bites are easy to find across the district, especially around bus stands, markets and evening streets.",
   },
 ];
 

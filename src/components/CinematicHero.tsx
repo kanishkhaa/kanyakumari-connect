@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, ArrowRight, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import beachImg from "@/assets/hero-beach.jpg";
-import natureImg from "@/assets/hero-nature.jpg";
-import spiritualImg from "@/assets/hero-spiritual.jpg";
-import heritageImg from "@/assets/hero-heritage.jpg";
+import beachImg from "@/assets/place-capecomorin.jpg";
+import natureImg from "@/assets/region-hills.jpg";
+import spiritualImg from "@/assets/place-kumariammantemple.jpg";
+import heritageImg from "@/assets/place-padmanabhapurampalace.jpg";
 
 const slides = [
   {
