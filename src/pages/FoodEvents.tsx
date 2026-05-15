@@ -3,6 +3,7 @@ import { dishes, events, emergencyContacts, restaurants } from "@/data/food";
 import type { Restaurant } from "@/data/food";
 import { Calendar, MapPin, Phone, Navigation, UtensilsCrossed, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 type NearbyRestaurant = Restaurant & {
   distance?: number;
@@ -24,7 +25,7 @@ export default function FoodEvents() {
       async ({ coords }) => {
         setStatus("Searching nearby restaurants...");
         try {
-          const res = await fetch(`/api/nearby?type=food&lat=${coords.latitude}&lon=${coords.longitude}`);
+          const res = await fetchWithTimeout(`/api/nearby?type=food&lat=${coords.latitude}&lon=${coords.longitude}`);
           if (!res.ok) throw new Error("Nearby lookup failed");
           const json = await res.json();
           const items = (json.items || [])

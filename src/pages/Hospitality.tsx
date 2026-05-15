@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
 import { Bed, UtensilsCrossed, Bus, ShieldCheck, Headphones, Hospital, Siren, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 type NearbyPlace = {
   id: number;
@@ -46,7 +47,7 @@ export default function Hospitality() {
       async ({ coords }) => {
         setStatus("Searching nearby emergency services...");
         try {
-          const res = await fetch(`/api/nearby?type=emergency&lat=${coords.latitude}&lon=${coords.longitude}`);
+          const res = await fetchWithTimeout(`/api/nearby?type=emergency&lat=${coords.latitude}&lon=${coords.longitude}`);
           if (!res.ok) throw new Error("Nearby lookup failed");
           const json = await res.json();
           const items = (json.items || []).map((item: any) => ({

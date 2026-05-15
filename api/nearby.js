@@ -1,10 +1,13 @@
-const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass.openstreetmap.ru/api/interpreter",
+];
 
 const configs = {
   food: {
-    radius: 7000,
     query: (lat, lon) => `
-      [out:json][timeout:25];
+      [out:json][timeout:18];
       (
         node["amenity"~"restaurant|cafe|fast_food"](around:7000,${lat},${lon});
         way["amenity"~"restaurant|cafe|fast_food"](around:7000,${lat},${lon});
@@ -13,9 +16,8 @@ const configs = {
     `,
   },
   emergency: {
-    radius: 10000,
     query: (lat, lon) => `
-      [out:json][timeout:25];
+      [out:json][timeout:18];
       (
         node["amenity"="hospital"](around:10000,${lat},${lon});
         way["amenity"="hospital"](around:10000,${lat},${lon});
@@ -57,7 +59,17 @@ function normalize(item, lat, lon, type) {
   };
 }
 
-module.exports = async function handler(req, res) {
+async function fetchWithTimeout(url, options, timeoutMs = 12000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
 
@@ -76,31 +88,39 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  try {
-    const upstream = await fetch(OVERPASS_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=UTF-8",
-        "User-Agent": "kaniya-kanyakumari-connect/1.0",
-      },
-      body: config.query(lat, lon),
-    });
+  const body = config.query(lat, lon);
+  let lastError = "Nearby lookup failed";
 
-    if (!upstream.ok) {
-      res.status(502).json({ error: `Overpass returned ${upstream.status}` });
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    try {
+      const upstream = await fetchWithTimeout(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=UTF-8",
+          "User-Agent": "kaniya-kanyakumari-connect/1.0",
+        },
+        body,
+      });
+
+      if (!upstream.ok) {
+        lastError = `Overpass returned ${upstream.status}`;
+        continue;
+      }
+
+      const json = await upstream.json();
+      const items = (json.elements || [])
+        .map((item) => normalize(item, lat, lon, type))
+        .filter(Boolean)
+        .filter((item) => item.name)
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 24);
+
+      res.status(200).json({ items });
       return;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : "Nearby lookup failed";
     }
-
-    const json = await upstream.json();
-    const items = (json.elements || [])
-      .map((item) => normalize(item, lat, lon, type))
-      .filter(Boolean)
-      .filter((item) => item.name)
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, 24);
-
-    res.status(200).json({ items });
-  } catch (error) {
-    res.status(500).json({ error: "Nearby lookup failed" });
   }
-};
+
+  res.status(502).json({ error: lastError });
+}

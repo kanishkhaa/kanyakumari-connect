@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/nearby.js": {
+      "maxDuration": 20
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/((?!api/.*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
