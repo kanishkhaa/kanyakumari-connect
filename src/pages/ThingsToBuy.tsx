@@ -1,7 +1,9 @@
-import { products } from "@/data/marketplace";
+import { productImage, products as fallbackProducts } from "@/data/marketplace";
+import { useCollection } from "@/hooks/useCollection";
 import { MapPin, ShoppingBag } from "lucide-react";
 
 export default function ThingsToBuy() {
+  const { data: products } = useCollection("products", fallbackProducts);
   const categories = Array.from(new Set(products.map((p) => p.category)));
 
   return (
@@ -10,7 +12,7 @@ export default function ThingsToBuy() {
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">Souvenirs</p>
         <h1 className="mt-2 font-display text-5xl font-bold">Things to buy in Kanyakumari</h1>
         <p className="mt-4 text-muted-foreground text-lg">
-          Real local buys from Kanyakumari include seashell craft, palm-leaf articles, wood and bamboo handicrafts, brass idols, banana chips, spices and handloom textiles.
+          Real local buys from Kanyakumari include seashell craft, preserved palm-leaf art, coconut-shell decor, brass lamps, Nagercoil snacks, hill spices and handloom textiles.
         </p>
       </header>
 
@@ -21,7 +23,7 @@ export default function ThingsToBuy() {
             {products.filter((p) => p.category === cat).map((p) => (
               <article key={p.id} className="group overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-smooth hover:shadow-elevated">
                 <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-smooth duration-700 group-hover:scale-105" />
+                  <img src={productImage(p)} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-smooth duration-700 group-hover:scale-105" />
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-primary">

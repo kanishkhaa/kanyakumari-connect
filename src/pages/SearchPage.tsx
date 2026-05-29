@@ -3,7 +3,7 @@ import { Search as SearchIcon, MapPin, Coffee, Home, ShoppingBag, Heart } from "
 import { places } from "@/data/places";
 import { dishes } from "@/data/food";
 import { stays } from "@/data/stays";
-import { products } from "@/data/marketplace";
+import { productImage, products } from "@/data/marketplace";
 import { experiences } from "@/data/experiences";
 
 export default function SearchPage() {
@@ -35,7 +35,7 @@ export default function SearchPage() {
         <Group icon={Coffee} label="Food" results={dishR.map((d) => ({ to: "/food", title: d.name, sub: d.type, img: d.image }))} />
         <Group icon={Home} label="Stays" results={stayR.map((s) => ({ to: "/stays", title: s.name, sub: s.location, img: s.image }))} />
         <Group icon={Heart} label="Experiences" results={expR.map((e) => ({ to: "/experiences", title: e.title, sub: e.host, img: e.image }))} />
-        <Group icon={ShoppingBag} label="Things to buy" results={prodR.map((p) => ({ to: "/things-to-buy", title: p.name, sub: p.category, img: p.image }))} />
+        <Group icon={ShoppingBag} label="Things to buy" results={prodR.map((p) => ({ to: "/things-to-buy", title: p.name, sub: p.category, img: productImage(p) }))} />
 
         {total === 0 && (
           <div className="text-center py-20">
