@@ -3,57 +3,71 @@ export type Brochure = {
   title: string;
   pages: number;
   size: string;
-  category: "Itinerary" | "Map" | "Cultural" | "Adventure";
+  category: "Itinerary" | "Map" | "Cultural" | "Adventure" | "Official";
   description: string;
+  sourceUrl: string;
+  actionLabel: string;
 };
 
 export const brochures: Brochure[] = [
   {
-    id: "kk-3day",
-    title: "Kanyakumari in 3 Days — Classic Itinerary",
-    pages: 16,
-    size: "4.2 MB",
+    id: "district-tourist-information",
+    title: "Kanniyakumari District Tourist Information",
+    pages: 1,
+    size: "Govt portal",
+    category: "Official",
+    description: "Official district tourism contact page with Tourist Office, Hotel Tamil Nadu and Vivekananda Rock information-centre details.",
+    sourceUrl: "https://kanniyakumari.nic.in/tourist-information/",
+    actionLabel: "Open",
+  },
+  {
+    id: "official-kumari-tourism",
+    title: "Kanniyakumari Official Tourism Website",
+    pages: 1,
+    size: "Govt portal",
+    category: "Official",
+    description: "District-linked official tourism portal for places, routes, visitor information and local tourism discovery.",
+    sourceUrl: "https://www.kumaritourism.com/",
+    actionLabel: "Open",
+  },
+  {
+    id: "vivekananda-rock-visitor-info",
+    title: "Vivekananda Rock Memorial Visitor Information",
+    pages: 1,
+    size: "Govt portal",
+    category: "Cultural",
+    description: "Official attraction page with timings, emergency contacts, bus route details and ferry booking reference.",
+    sourceUrl: "https://kanniyakumari.nic.in/tspot_vrm/",
+    actionLabel: "Open",
+  },
+  {
+    id: "tamil-nadu-tourism-guide",
+    title: "Tamil Nadu Tourism Guide",
+    pages: 1,
+    size: "PDF",
     category: "Itinerary",
-    description: "Day-by-day plan covering Vivekananda Rock, Suchindram, Padmanabhapuram and beaches.",
+    description: "Government of India tourism PDF covering Tamil Nadu tours and travel circuits, including South India routes.",
+    sourceUrl: "https://tourism.gov.in/sites/default/files/2019-10/tamilnadu.pdf",
+    actionLabel: "PDF",
   },
   {
-    id: "district-map",
-    title: "Kanyakumari District — Tourist Map",
-    pages: 4,
-    size: "2.1 MB",
+    id: "ttdc-virtual-tour",
+    title: "TTDC Virtual Tours",
+    pages: 1,
+    size: "Govt portal",
     category: "Map",
-    description: "High-resolution map with all 4 sub-regions, key roads, ferry points and viewpoints.",
+    description: "Tamil Nadu Tourism / TTDC virtual-tour portal for official destination previews and planning support.",
+    sourceUrl: "https://www.tntourismvirtualtour.com/",
+    actionLabel: "Open",
   },
   {
-    id: "temples-trail",
-    title: "Temple Trails of the Southern Tip",
-    pages: 24,
-    size: "6.8 MB",
-    category: "Cultural",
-    description: "Heritage circuit covering 12 ancient temples with timings, dress code and history.",
-  },
-  {
-    id: "western-ghats",
-    title: "Western Ghats Adventure Guide",
-    pages: 20,
-    size: "5.4 MB",
-    category: "Adventure",
-    description: "Trekking routes in Mahendragiri, dam visits and Kani village stays.",
-  },
-  {
-    id: "food-trail",
-    title: "Eat Like a Local — Kanyakumari Food Trail",
-    pages: 18,
-    size: "5.0 MB",
-    category: "Cultural",
-    description: "Where to find the best fish curry, appam-stew and authentic banana-leaf meals.",
-  },
-  {
-    id: "responsible-travel",
-    title: "Responsible Travel Handbook",
-    pages: 12,
-    size: "1.8 MB",
-    category: "Cultural",
-    description: "How to travel respectfully, support local artisans and protect coastal ecology.",
+    id: "district-contact-directory",
+    title: "Kanniyakumari District Contact Directory",
+    pages: 1,
+    size: "Govt portal",
+    category: "Official",
+    description: "Official district contact directory useful for verified public-office, police, fire and utility contacts.",
+    sourceUrl: "https://kanniyakumari.nic.in/contactdirectorydatatable/",
+    actionLabel: "Open",
   },
 ];

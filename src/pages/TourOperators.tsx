@@ -4,7 +4,7 @@ import type { Operator } from "@/data/operators";
 import { useCollection } from "@/hooks/useCollection";
 import { getReviews, getVendorOperators, saveReview } from "@/lib/localMarketplace";
 import { useI18n } from "@/i18n/I18nContext";
-import { Star, ShieldCheck, Phone, Mail } from "lucide-react";
+import { ExternalLink, ShieldCheck, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function TourOperators() {
@@ -39,7 +39,7 @@ export default function TourOperators() {
                     {o.verified && <span className="inline-flex items-center gap-1 text-secondary"><ShieldCheck className="h-3 w-3" /> Verified</span>}
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground flex items-center gap-1"><Star className="h-3 w-3 fill-accent text-accent" /> {o.rating} <span className="text-muted-foreground/70">({o.reviews + reviews.length})</span></p>
+                <p className="text-xs text-muted-foreground">{reviews.length ? `${reviews.length} traveller review${reviews.length === 1 ? "" : "s"}` : "Contact operator directly"}</p>
               </div>
               <p className="text-sm text-muted-foreground mt-3">{o.speciality}</p>
               <div className="mt-3 space-y-1 text-xs text-muted-foreground">
@@ -50,6 +50,7 @@ export default function TourOperators() {
               <div className="mt-5 flex flex-wrap gap-2">
                 <a href={`tel:${o.phone.replace(/[^0-9]/g, "")}`} className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-smooth"><Phone className="h-3.5 w-3.5" /> {o.phone}</a>
                 <a href={`mailto:${o.email}`} className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-muted hover:bg-muted/70 transition-smooth"><Mail className="h-3.5 w-3.5" /> Email</a>
+                {o.website && <a href={o.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-muted hover:bg-muted/70 transition-smooth"><ExternalLink className="h-3.5 w-3.5" /> Website</a>}
                 <Button size="sm" variant="outline" onClick={() => setReviewFor(o.id)}>Add review</Button>
               </div>
             </article>

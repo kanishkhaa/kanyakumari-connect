@@ -197,10 +197,11 @@ export const events: Eventt[] = [
 ];
 
 export const emergencyContacts = [
-  { name: "Police (Kanyakumari)", number: "04652-246224" },
-  { name: "Govt Hospital", number: "04652-246135" },
-  { name: "Tourist Helpline", number: "1363" },
+  { name: "National Emergency Response", number: "112" },
+  { name: "Police", number: "100" },
+  { name: "Fire and Rescue", number: "101" },
   { name: "Ambulance", number: "108" },
-  { name: "Coast Guard", number: "1554" },
-  { name: "Fire", number: "101" },
+  { name: "District Control Centre", number: "1077" },
+  { name: "Kanniyakumari Municipality", number: "04652-246279" },
+  { name: "Tourism Department", number: "+91 91769 95866" },
 ];

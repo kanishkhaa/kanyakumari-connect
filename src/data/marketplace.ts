@@ -1,9 +1,21 @@
 import basketImg from "@/assets/market-basket.jpg";
-import bananaChipsImg from "@/assets/food-bananachips.jpeg";
 import sareeImg from "@/assets/market-saree.jpg";
 import shellsImg from "@/assets/market-shells.jpg";
-import spicesImg from "@/assets/market-spices.jpg";
 import foodImg from "@/assets/food-appam.jpg";
+import buyBananaChipsImg from "@/assets/buy-bananachips.jpg";
+import buyBrassImg from "@/assets/buy-brass.jpg";
+import buyCinnamonImg from "@/assets/buy-cinnamon.jpg";
+import buyCloveImg from "@/assets/buy-clove.jpg";
+import buyCoconutShellImg from "@/assets/buy-coconutshell.jpg";
+import buyDhotiImg from "@/assets/buy-dhoti.jpg";
+import buyHandicraftsImg from "@/assets/buy-handicrafts.jpg";
+import buyHandloomImg from "@/assets/buy-handloom.jpg";
+import buyJackfruitChipsImg from "@/assets/buy-jackfruitchips.jpg";
+import buyMixtureImg from "@/assets/buy-mixture.jpg";
+import buyPalmImg from "@/assets/buy-palm.jpg";
+import buyPalmLeafImg from "@/assets/buy-palmleaf.jpg";
+import buySanguImg from "@/assets/buy-sangu.jpg";
+import buySeashellImg from "@/assets/buy-seashell.jpg";
 
 export type Product = {
   id: string;
@@ -25,20 +37,20 @@ export type Product = {
 };
 
 export const productImages: Record<string, string> = {
-  "seashell-crafts": shellsImg,
-  "conch-shell-keepsakes": shellsImg,
-  "palm-leaf-products": basketImg,
-  "palm-leaf-framed-art": basketImg,
-  "wood-bamboo-handicrafts": sareeImg,
-  "brass-lamps-idols": sareeImg,
-  "coconut-shell-craft": basketImg,
-  "banana-chips": bananaChipsImg,
-  "jackfruit-chips": bananaChipsImg,
-  "nagercoil-savouries": foodImg,
-  "kanyakumari-clove-pepper": spicesImg,
-  "cardamom-masala-packets": spicesImg,
-  "handloom-textiles": sareeImg,
-  "cotton-dhotis-towels": sareeImg,
+  "seashell-crafts": buySeashellImg,
+  "conch-shell-keepsakes": buySanguImg,
+  "palm-leaf-products": buyPalmImg,
+  "palm-leaf-framed-art": buyPalmLeafImg,
+  "wood-bamboo-handicrafts": buyHandicraftsImg,
+  "brass-lamps-idols": buyBrassImg,
+  "coconut-shell-craft": buyCoconutShellImg,
+  "banana-chips": buyBananaChipsImg,
+  "jackfruit-chips": buyJackfruitChipsImg,
+  "nagercoil-savouries": buyMixtureImg,
+  "kanyakumari-clove-pepper": buyCloveImg,
+  "cardamom-masala-packets": buyCinnamonImg,
+  "handloom-textiles": buyHandloomImg,
+  "cotton-dhotis-towels": buyDhotiImg,
 };
 
 export function productImage(product: Product) {
@@ -135,7 +147,7 @@ export const products: Product[] = [
     name: "Nendran Banana Chips and Jackfruit Chips",
     artisan: "Local snack makers",
     village: "Nagercoil and Kanyakumari",
-    image: bananaChipsImg,
+    image: buyBananaChipsImg,
     price: 120,
     category: "Food Souvenir",
     description:
@@ -147,7 +159,7 @@ export const products: Product[] = [
     name: "Jackfruit Chips",
     artisan: "Kumari snack makers",
     village: "Nagercoil and Kurunthancode",
-    image: bananaChipsImg,
+    image: buyJackfruitChipsImg,
     price: 140,
     category: "Food Souvenir",
     description:
@@ -171,7 +183,7 @@ export const products: Product[] = [
     name: "Kanyakumari Clove and Black Pepper",
     artisan: "Hill and market traders",
     village: "Maramalai, Karumparai, Velimalai and Nagercoil markets",
-    image: spicesImg,
+    image: buyCloveImg,
     price: 160,
     category: "Spices",
     description:
@@ -183,7 +195,7 @@ export const products: Product[] = [
     name: "Cardamom, Cinnamon and House Masala Packets",
     artisan: "Spice merchants",
     village: "Nagercoil and hill-produce markets",
-    image: spicesImg,
+    image: buyCinnamonImg,
     price: 180,
     category: "Spices",
     description:

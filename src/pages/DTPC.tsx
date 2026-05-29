@@ -1,6 +1,6 @@
 import { dtpcCenters } from "@/data/dtpc";
 import { useI18n } from "@/i18n/I18nContext";
-import { MapPin, Phone, Clock } from "lucide-react";
+import { ExternalLink, MapPin, Phone, Clock } from "lucide-react";
 
 export default function DTPC() {
   const { t } = useI18n();
@@ -26,6 +26,9 @@ export default function DTPC() {
                 <span key={s} className="text-[11px] px-2 py-1 rounded-full bg-muted">{s}</span>
               ))}
             </div>
+            <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+              Official source <ExternalLink className="h-3.5 w-3.5" />
+            </a>
           </article>
         ))}
       </div>

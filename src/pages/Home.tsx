@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import CinematicHero from "@/components/CinematicHero";
 import PlaceCard from "@/components/PlaceCard";
 import { places } from "@/data/places";
-import { dishes, events } from "@/data/food";
+import { dishes } from "@/data/food";
+import { events as fallbackEvents } from "@/data/events";
 import { experiences } from "@/data/experiences";
 import { stays } from "@/data/stays";
 import { weather, stats } from "@/data/regions";
+import { useCollection } from "@/hooks/useCollection";
 import danceImg from "@/assets/exp-dance.jpg";
 
 export default function Home() {
+  const { data: events } = useCollection("events", fallbackEvents);
+
   return (
     <>
       <CinematicHero />
@@ -198,9 +202,9 @@ export default function Home() {
       {/* Festivals timeline */}
       <section className="container mx-auto py-24 px-4">
         <div className="max-w-2xl mb-12">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">Live calendar</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary">Events and festivals</p>
           <h2 className="mt-2 font-display text-4xl md:text-5xl font-bold">Festivals, all year long</h2>
-          <p className="mt-4 text-muted-foreground text-lg">Plan around temple festivals and cultural fairs to experience Kanyakumari at its most alive.</p>
+          <p className="mt-4 text-muted-foreground text-lg">Plan around the same temple festivals, cultural seasons and coastal celebrations listed in the events calendar.</p>
         </div>
         <div className="relative">
           <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2" />
@@ -208,13 +212,16 @@ export default function Home() {
             {events.map((e, i) => (
               <div key={e.id} className={`md:grid md:grid-cols-2 md:gap-12 items-center ${i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""}`}>
                 <div className={`p-6 rounded-2xl bg-card border border-border shadow-soft ${i % 2 === 0 ? "md:text-right" : ""}`}>
+                  <img src={e.image} alt={e.title} loading="lazy" className="mb-4 aspect-[16/9] w-full rounded-lg object-cover md:hidden" />
                   <p className="text-xs font-semibold text-primary uppercase tracking-widest">{e.month}</p>
-                  <h3 className="mt-1 font-display text-2xl font-bold">{e.name}</h3>
+                  <h3 className="mt-1 font-display text-2xl font-bold">{e.title}</h3>
                   <p className="text-xs text-muted-foreground mt-1">{e.location}</p>
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{e.description}</p>
                 </div>
                 <div className="hidden md:flex justify-center">
-                  <span className="h-4 w-4 rounded-full gradient-sunset shadow-warm" />
+                  <div className="relative z-10 w-full max-w-xs overflow-hidden rounded-xl border-4 border-background bg-muted shadow-elevated aspect-[16/10]">
+                    <img src={e.image} alt={e.title} loading="lazy" className="h-full w-full object-cover" />
+                  </div>
                 </div>
               </div>
             ))}

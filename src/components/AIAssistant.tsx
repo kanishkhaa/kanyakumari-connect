@@ -56,7 +56,7 @@ const intents: { match: RegExp; reply: Msg }[] = [
     match: /emerg|police|hospital|help/i,
     reply: {
       role: "bot",
-      text: "Quick numbers — Police: 04652-246224, Ambulance: 108, Tourist Helpline: 1363. Full list in Food & Events page.",
+      text: "Quick numbers — National Emergency: 112, Police: 100, Fire: 101, Ambulance: 108, District Control Centre: 1077. Full list is in the SOS drawer.",
       links: [{ label: "Emergency contacts", to: "/food" }],
     },
   },

@@ -75,7 +75,7 @@ export default function CinematicHero() {
       <div className="absolute inset-0 bg-gradient-to-r from-ocean-deep/70 via-ocean-deep/20 to-transparent" />
 
       {/* Content */}
-      <div className="absolute inset-0 container mx-auto flex flex-col justify-end pb-32 md:pb-40">
+      <div className="absolute inset-0 container mx-auto flex flex-col justify-end pb-44 md:pb-52">
         <div key={slide.key} className="max-w-2xl text-background animate-fade-in-up">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest bg-background/15 backdrop-blur border border-background/30">
             {slide.eyebrow}
@@ -98,7 +98,7 @@ export default function CinematicHero() {
       </div>
 
       {/* Slide controls */}
-      <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 flex items-center gap-2 z-10">
+      <div className="absolute bottom-24 right-6 md:bottom-28 md:right-10 flex items-center gap-2 z-10">
         <button
           aria-label="Previous"
           onClick={() => setIdx((i) => (i - 1 + slides.length) % slides.length)}
@@ -123,12 +123,12 @@ export default function CinematicHero() {
       </div>
 
       {/* Tabs */}
-      <div className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-44 z-10 flex gap-1 p-1 rounded-full bg-background/15 backdrop-blur border border-background/30">
+      <div className="absolute bottom-24 md:bottom-28 left-4 right-28 md:left-auto md:right-44 md:w-auto z-10 flex gap-1 overflow-x-auto p-1 rounded-full bg-background/15 backdrop-blur border border-background/30">
         {slides.map((s, i) => (
           <button
             key={s.key}
             onClick={() => setIdx(i)}
-            className={`px-3 md:px-4 py-1.5 rounded-full text-xs font-medium transition-smooth ${
+            className={`flex-shrink-0 px-3 md:px-4 py-1.5 rounded-full text-xs font-medium transition-smooth ${
               i === idx ? "bg-background text-foreground" : "text-background hover:bg-background/15"
             }`}
           >
