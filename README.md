@@ -2,8 +2,6 @@
 
 Kaniya is a modern tourism discovery and planning platform for Kanniyakumari/Kanyakumari. It brings together places to visit, trip planning, stays, local experiences, food, festivals, official tourism contacts, emergency support, eBrochures, tour operators, photo/video galleries, and locally relevant things to buy in one responsive web application.
 
-The project is built as a frontend-first React application with local fallback datasets and optional Supabase-backed dynamic content. It is designed to work reliably in local development while still supporting production content updates through the database.
-
 ## Highlights
 
 - Cinematic landing page with rotating hero sections for spiritual, beach, heritage, and nature travel themes.
