@@ -32,14 +32,50 @@ export const en = {
   watch: "Watch",
   book_now: "Book now",
   call: "Call",
+  filter_all: "All",
+  filter_hotel: "Hotels",
+  filter_resort: "Resorts",
+  filter_homestay: "Homestays",
 
   // home
   home_tagline: "Where India begins",
   home_intro:
     "One verified platform for everything Kanyakumari — discover, plan, stay and support local communities.",
+  home_hero_title: "Explore the Land of Three Seas",
+  home_hero_subtitle: "Experience majestic sunrises, sacred heritage, coastal cuisine, and peaceful beachscapes at India's southern tip.",
+  explore_places: "Explore Top Attractions",
+  plan_trip_ai: "Plan Your Trip with AI",
+  book_stays: "Verified Stays",
+  local_food: "Authentic Coastal Cuisine",
+  verified_hosts: "Local Verified Hosts",
 
-  // page titles
-  travelcare_title: "TravelCare — Safe & responsible tourism",
+  // ai assistant
+  ai_assistant_title: "Kanyakumari AI Assistant",
+  ai_assistant_subtitle: "Powered by Gemini AI — Ask anything about places, food, weather & transport!",
+  ai_assistant_placeholder: "Ask in English or தமிழ் (e.g. Best sunrise spot?)...",
+  ai_assistant_send: "Send",
+
+  // places & detail
+  place_overview: "Overview",
+  place_highlights: "Highlights & Features",
+  place_tips: "Local Traveler Tips",
+  best_time: "Best Time to Visit",
+  entry_fee: "Entry Fee",
+  timings: "Timings",
+  location: "Location",
+
+  // itinerary planner
+  itinerary_title: "AI-Powered Trip Planner",
+  itinerary_subtitle: "Customized day-wise itinerary generated instantly by Gemini AI",
+  itinerary_generate_ai: "Generate Custom Trip with AI",
+  days: "Duration (Days)",
+  budget: "Budget Range",
+  pace: "Travel Pace",
+  interests: "Interests & Preferences",
+  travel_mode: "Mode of Transport",
+
+  // page titles & headers
+  travelcare_title: "TravelCare — Safe & Responsible Tourism",
   travelcare_intro:
     "Your safety, hygiene and well-being come first. Verified hotels, safe-tourism guidelines, helplines and travel advisories.",
   microsites_title: "Microsites",
@@ -64,4 +100,14 @@ export const en = {
   hospitality_intro: "Everything you need to consider for a trip to Kanyakumari.",
   operators_title: "Find a Tour Operator",
   operators_intro: "Verified, licensed tour operators offering district and South India circuits.",
+  onboard_title: "Host & Merchant Registration",
+  onboard_subtitle: "Register your stay, cab service, or tour operation to reach thousands of travelers.",
+
+  // footer
+  footer_tagline: "Connecting travelers with authentic Kanyakumari culture and tourism.",
+  footer_copyright: "© Kanyakumari Connect. District Tourism Information Portal.",
+  footer_quick_links: "Quick Links",
+  footer_explore: "Explore",
+  footer_support: "Support & Contact",
 };
+

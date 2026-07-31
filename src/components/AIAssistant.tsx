@@ -1,93 +1,54 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Sparkles, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useI18n } from "@/i18n/I18nContext";
+import { askGeminiChatbot } from "@/lib/gemini";
 
 type Msg = { role: "bot" | "user"; text: string; links?: { label: string; to: string }[] };
 
-const intents: { match: RegExp; reply: Msg }[] = [
-  {
-    match: /sunrise|sunset/i,
-    reply: {
-      role: "bot",
-      text: "The Triveni Sangam beach is the spot — it's the only place in India to see both sunrise and sunset over the sea. Reach 30 min before for the best view.",
-      links: [{ label: "View beach details", to: "/places/triveni-sangam-beach" }],
-    },
-  },
-  {
-    match: /vivek|rock|memorial/i,
-    reply: {
-      role: "bot",
-      text: "Vivekananda Rock Memorial opens 8 AM – 4 PM (closed Mon). Take the government ferry from the mainland jetty. Tickets ₹50.",
-      links: [{ label: "See the place", to: "/places/vivekananda-rock-memorial" }],
-    },
-  },
-  {
-    match: /food|eat|restaurant|dish/i,
-    reply: {
-      role: "bot",
-      text: "Don't miss the Meen Kuzhambu (fish curry) and banana-leaf meals. I've curated the must-try dishes for you.",
-      links: [{ label: "Food guide", to: "/food" }],
-    },
-  },
-  {
-    match: /stay|hotel|homestay/i,
-    reply: {
-      role: "bot",
-      text: "We list only verified stays — homestays, eco-lodges, hotels and tribal stays. Prices start at ₹1,500/night.",
-      links: [{ label: "Browse stays", to: "/stays" }],
-    },
-  },
-  {
-    match: /plan|itiner|days|trip/i,
-    reply: {
-      role: "bot",
-      text: "Tell me your days, budget and interests in the planner — I'll build a day-wise plan in seconds.",
-      links: [{ label: "Open planner", to: "/itinerary" }],
-    },
-  },
-  {
-    match: /weather|when|month|season/i,
-    reply: {
-      role: "bot",
-      text: "Best season: October to February. Cool 20–28°C and clear skies. Avoid April–May (hot) unless you're here for Chitra Pournami.",
-    },
-  },
-  {
-    match: /emerg|police|hospital|help/i,
-    reply: {
-      role: "bot",
-      text: "Quick numbers — National Emergency: 112, Police: 100, Fire: 101, Ambulance: 108, District Control Centre: 1077. Full list is in the SOS drawer.",
-      links: [{ label: "Emergency contacts", to: "/food" }],
-    },
-  },
-];
-
-const fallback: Msg = {
-  role: "bot",
-  text: "I can help with places, planning, food, stays, weather and emergency info. What would you like to know?",
-};
-
-const greeting: Msg = {
-  role: "bot",
-  text: "Vanakkam! 🌅 I'm your Kanyakumari assistant. Ask me about places, food, the best time to visit, or how to plan your trip.",
-};
-
 export default function AIAssistant() {
+  const { lang, t } = useI18n();
   const [open, setOpen] = useState(false);
-  const [msgs, setMsgs] = useState<Msg[]>([greeting]);
+  const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [msgs, open]);
+    const greetingText = lang === "ta"
+      ? "வணக்கம்! 🌅 நான் உங்கள் கன்னியாகுமரி AI உதவியாளர். இடங்கள், உணவு, தங்குமிடங்கள் அல்லது பயண திட்டங்கள் பற்றி என்னிடம் கேளுங்கள்."
+      : "Vanakkam! 🌅 I'm your Gemini AI Kanyakumari assistant. Ask me about places, food, weather, or custom trip plans.";
+    setMsgs([{ role: "bot", text: greetingText }]);
+  }, [lang]);
 
-  const send = () => {
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [msgs, loading, open]);
+
+  const send = async () => {
     const text = input.trim();
-    if (!text) return;
-    const reply = intents.find((i) => i.match.test(text))?.reply ?? fallback;
-    setMsgs((m) => [...m, { role: "user", text }, reply]);
+    if (!text || loading) return;
+
+    setMsgs((m) => [...m, { role: "user", text }]);
     setInput("");
+    setLoading(true);
+
+    try {
+      const aiReply = await askGeminiChatbot(text, lang);
+      setMsgs((m) => [...m, { role: "bot", text: aiReply }]);
+    } catch (err) {
+      setMsgs((m) => [
+        ...m,
+        {
+          role: "bot",
+          text: lang === "ta"
+            ? "மன்னிக்கும், தற்சமயம் பதில் தர இயலவில்லை. மீண்டும் முயற்சிக்கவும்."
+            : "Sorry, I could not generate a response right now. Please try again.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -108,8 +69,8 @@ export default function AIAssistant() {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5" />
                 <div>
-                  <p className="font-semibold leading-tight">Kaniya Assistant</p>
-                  <p className="text-[11px] opacity-90">Always here, even offline</p>
+                  <p className="font-semibold leading-tight">{t("ai_assistant_title")}</p>
+                  <p className="text-[11px] opacity-90">{lang === "ta" ? "Gemini AI மூலம் இயங்குகிறது" : "Powered by Gemini AI"}</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="p-1 hover:bg-background/20 rounded">
@@ -121,7 +82,7 @@ export default function AIAssistant() {
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm ${
-                    m.role === "user" ? "gradient-sunset text-primary-foreground rounded-br-sm" : "bg-muted text-foreground rounded-bl-sm"
+                    m.role === "user" ? "gradient-sunset text-primary-foreground rounded-br-sm" : "bg-muted text-foreground rounded-bl-sm whitespace-pre-wrap"
                   }`}>
                     <p className="leading-relaxed">{m.text}</p>
                     {m.links && (
@@ -141,6 +102,14 @@ export default function AIAssistant() {
                   </div>
                 </div>
               ))}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="flex items-center gap-2 rounded-2xl bg-muted px-4 py-2.5 text-xs text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    {lang === "ta" ? "Gemini AI சிந்திக்கிறது..." : "Gemini AI is thinking..."}
+                  </div>
+                </div>
+              )}
               <div ref={endRef} />
             </div>
 
@@ -149,10 +118,14 @@ export default function AIAssistant() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
-                placeholder="Ask anything..."
+                placeholder={t("ai_assistant_placeholder")}
                 className="flex-1 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
-              <button onClick={send} className="h-9 w-9 rounded-lg gradient-sunset text-primary-foreground flex items-center justify-center hover:scale-105 transition-smooth">
+              <button
+                onClick={send}
+                disabled={loading}
+                className="h-9 w-9 rounded-lg gradient-sunset text-primary-foreground flex items-center justify-center hover:scale-105 transition-smooth disabled:opacity-50"
+              >
                 <Send className="h-4 w-4" />
               </button>
             </div>

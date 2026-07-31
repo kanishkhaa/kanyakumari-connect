@@ -3,17 +3,20 @@ import { ArrowRight, MapPin, Compass, Calendar, Heart, ShoppingBag, Cloud, Spark
 import { Button } from "@/components/ui/button";
 import CinematicHero from "@/components/CinematicHero";
 import PlaceCard from "@/components/PlaceCard";
-import { places } from "@/data/places";
+import { places, getTranslatedPlace } from "@/data/places";
 import { dishes } from "@/data/food";
 import { events as fallbackEvents } from "@/data/events";
 import { experiences } from "@/data/experiences";
 import { stays } from "@/data/stays";
 import { weather, stats } from "@/data/regions";
 import { useCollection } from "@/hooks/useCollection";
+import { useI18n } from "@/i18n/I18nContext";
 import danceImg from "@/assets/exp-dance.jpg";
 
 export default function Home() {
+  const { t, lang } = useI18n();
   const { data: events } = useCollection("events", fallbackEvents);
+
 
   return (
     <>
@@ -74,7 +77,7 @@ export default function Home() {
             <p className="mt-4 text-muted-foreground text-lg">From the meditation rock to the wooden palace — start with the unmissable.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {places.slice(0, 6).map((p) => <PlaceCard key={p.id} place={p} />)}
+            {places.slice(0, 6).map((p) => <PlaceCard key={p.id} place={getTranslatedPlace(p, lang)} />)}
           </div>
         </div>
       </section>

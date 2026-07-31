@@ -13,6 +13,7 @@ import FoodEvents from "./pages/FoodEvents";
 import Onboard from "./pages/Onboard";
 import SearchPage from "./pages/SearchPage";
 import TravelCare from "./pages/TravelCare";
+import TravelCareAdmin from "./pages/TravelCareAdmin";
 import Events from "./pages/Events";
 import Brochures from "./pages/Brochures";
 import DTPC from "./pages/DTPC";
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/onboard" element={<Onboard />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/travelcare" element={<TravelCare />} />
+          <Route path="/admin" element={<TravelCareAdmin />} />
           <Route path="/events" element={<Events />} />
           <Route path="/ebrochures" element={<Brochures />} />
           <Route path="/dtpc" element={<DTPC />} />

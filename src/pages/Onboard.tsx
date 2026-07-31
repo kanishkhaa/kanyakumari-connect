@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { saveVendorOperator, saveVendorStay } from "@/lib/localMarketplace";
+import { saveHostApplication, saveVendorOperator, saveVendorStay } from "@/lib/localMarketplace";
 import { insertRow } from "@/lib/supabaseContent";
 import type { Stay } from "@/data/stays";
 import type { Operator } from "@/data/operators";
@@ -16,11 +16,38 @@ export default function Onboard() {
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
+    const business = String(form.get("business"));
+    const verified = Boolean(form.get("license") && form.get("idProof") && form.get("ownership"));
     const common = {
-      id: String(form.get("business")).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
-      name: String(form.get("business")),
-      verified: Boolean(form.get("license") && form.get("idProof") && form.get("ownership")),
+      id: business.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+      name: business,
+      verified,
     };
+
+    saveHostApplication({
+      id: `${Date.now()}`,
+      owner: String(form.get("owner")),
+      business,
+      listingType: type,
+      town: String(form.get("town")),
+      phone: String(form.get("phone")),
+      email: String(form.get("email") || "pending@kaniya.local"),
+      description: String(form.get("description")),
+      status: verified ? "approved" : "needs_review",
+      submittedAt: new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }).format(new Date()).replace(",", ""),
+      documents: {
+        idProof: Boolean(form.get("idProof")),
+        ownership: Boolean(form.get("ownership")),
+        license: Boolean(form.get("license")),
+      },
+    });
 
     if (type === "Tour Operator") {
       const operator: Operator = {

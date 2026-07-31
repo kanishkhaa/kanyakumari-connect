@@ -1,9 +1,11 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { Menu, X, Sun, Search, Phone, Globe, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronDown, Globe, Menu, Phone, Search, Sun, X, Shield, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { emergencyContacts } from "@/data/food";
 import { useI18n } from "@/i18n/I18nContext";
+import AdminLoginModal from "@/components/AdminLoginModal";
+import { fetchCollection, saveCollection } from "@/lib/supabaseContent";
 
 export default function Navbar() {
   const { t, lang, setLang } = useI18n();
@@ -11,8 +13,35 @@ export default function Navbar() {
   const [showSearch, setShowSearch] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [q, setQ] = useState("");
   const nav = useNavigate();
+
+  useEffect(() => {
+    async function checkAdminSession() {
+      const session = await fetchCollection<{ authenticated: boolean } | null>("admin_session", null);
+      if (session?.authenticated) {
+        setIsAdminLoggedIn(true);
+      }
+    }
+    checkAdminSession();
+  }, []);
+
+  const handleAdminClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAdminLoggedIn) {
+      nav("/admin");
+    } else {
+      setShowAdminModal(true);
+    }
+  };
+
+  const handleAdminLogout = async () => {
+    await saveCollection("admin_session", { authenticated: false });
+    setIsAdminLoggedIn(false);
+    nav("/");
+  };
 
   const links = [
     { to: "/places", label: t("nav_where") },
@@ -47,46 +76,42 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-background/80 border-b border-border">
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
         <div className="container mx-auto flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full gradient-sunset shadow-warm group-hover:scale-110 transition-smooth">
+          <Link to="/" className="group flex flex-shrink-0 items-center gap-2">
+            <span className="gradient-sunset shadow-warm flex h-9 w-9 items-center justify-center rounded-full transition-smooth group-hover:scale-110">
               <Sun className="h-5 w-5 text-primary-foreground" />
             </span>
             <div className="leading-tight">
               <p className="font-display text-xl font-bold">Kaniya<span className="text-primary">.</span></p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground -mt-1">Discover Kanyakumari</p>
+              <p className="-mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">Discover Kanyakumari</p>
             </div>
           </Link>
 
-          <nav className="hidden xl:flex items-center gap-1 flex-1 justify-center">
+          <nav className="hidden flex-1 items-center justify-center gap-1 xl:flex">
             {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 className={({ isActive }) =>
                   cn(
-                    "px-3 py-2 rounded-md text-sm font-medium transition-smooth",
-                    isActive ? "text-primary" : "text-foreground/70 hover:text-foreground hover:bg-muted",
+                    "rounded-md px-3 py-2 text-sm font-medium transition-smooth",
+                    isActive ? "text-primary" : "text-foreground/70 hover:bg-muted hover:text-foreground",
                   )
                 }
               >
                 {l.label}
               </NavLink>
             ))}
-            <div
-              className="relative"
-              onMouseEnter={() => setMoreOpen(true)}
-              onMouseLeave={() => setMoreOpen(false)}
-            >
-              <button className="px-3 py-2 rounded-md text-sm font-medium text-foreground/70 hover:text-foreground hover:bg-muted inline-flex items-center gap-1">
+            <div className="relative" onMouseEnter={() => setMoreOpen(true)} onMouseLeave={() => setMoreOpen(false)}>
+              <button className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-foreground/70 hover:bg-muted hover:text-foreground">
                 {t("nav_more")} <ChevronDown className="h-3.5 w-3.5" />
               </button>
               {moreOpen && (
-                <div className="absolute top-full right-0 pt-2 w-[640px]">
-                  <div className="bg-card border border-border rounded-2xl shadow-elevated p-4 grid grid-cols-2 gap-1">
+                <div className="absolute right-0 top-full w-[640px] pt-2">
+                  <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-4 shadow-elevated">
                     {moreLinks.map((m) => (
-                      <Link key={m.to} to={m.to} onClick={() => setMoreOpen(false)} className="px-3 py-2 rounded-md text-sm hover:bg-muted hover:text-primary transition-smooth">
+                      <Link key={m.to} to={m.to} onClick={() => setMoreOpen(false)} className="rounded-md px-3 py-2 text-sm transition-smooth hover:bg-muted hover:text-primary">
                         {m.label}
                       </Link>
                     ))}
@@ -97,82 +122,81 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowSearch(true)}
-              aria-label="Search"
-              className="h-9 w-9 rounded-full hover:bg-muted flex items-center justify-center transition-smooth"
-            >
+            {isAdminLoggedIn ? (
+              <div className="hidden items-center gap-1 sm:flex">
+                <Link to="/admin" className="h-9 items-center gap-1.5 rounded-full bg-primary/10 px-3 text-xs font-semibold text-primary transition-smooth hover:bg-primary/20 flex">
+                  <Shield className="h-3.5 w-3.5" /> Admin Dashboard
+                </Link>
+                <button onClick={handleAdminLogout} title="Logout Admin" className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted">
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button onClick={handleAdminClick} className="hidden h-9 items-center rounded-full bg-primary/10 px-3 text-xs font-semibold text-primary transition-smooth hover:bg-primary/20 sm:flex">
+                Admin
+              </button>
+            )}
+            <button onClick={() => setShowSearch(true)} aria-label="Search" className="flex h-9 w-9 items-center justify-center rounded-full transition-smooth hover:bg-muted">
               <Search className="h-4 w-4" />
             </button>
-            <button
-              onClick={() => setLang(lang === "en" ? "ta" : "en")}
-              className="hidden sm:flex h-9 px-3 rounded-full hover:bg-muted items-center gap-1 text-xs font-semibold transition-smooth"
-              aria-label="Language"
-            >
+            <button onClick={() => setLang(lang === "en" ? "ta" : "en")} className="hidden h-9 items-center gap-1 rounded-full px-3 text-xs font-semibold transition-smooth hover:bg-muted sm:flex" aria-label="Language">
               <Globe className="h-3.5 w-3.5" /> {lang === "en" ? "EN" : "தமிழ்"}
             </button>
-            <button
-              onClick={() => setShowEmergency(true)}
-              className="hidden sm:flex h-9 px-3 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 items-center gap-1.5 text-xs font-semibold transition-smooth"
-            >
+            <button onClick={() => setShowEmergency(true)} className="hidden h-9 items-center gap-1.5 rounded-full bg-destructive/10 px-3 text-xs font-semibold text-destructive transition-smooth hover:bg-destructive/20 sm:flex">
               <Phone className="h-3.5 w-3.5" /> SOS
             </button>
-            <button
-              aria-label="Toggle menu"
-              className="xl:hidden h-9 w-9 rounded-md hover:bg-muted flex items-center justify-center"
-              onClick={() => setOpen(!open)}
-            >
+            <button aria-label="Toggle menu" className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted xl:hidden" onClick={() => setOpen(!open)}>
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
         {open && (
-          <nav className="xl:hidden border-t border-border bg-background max-h-[80vh] overflow-y-auto">
-            <div className="container mx-auto py-3 flex flex-col">
+          <nav className="max-h-[80vh] overflow-y-auto border-t border-border bg-background xl:hidden">
+            <div className="container mx-auto flex flex-col py-3">
               {[...links, ...moreLinks].map((l) => (
                 <NavLink
                   key={l.to}
                   to={l.to}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) =>
-                    cn(
-                      "px-3 py-3 rounded-md text-sm font-medium",
-                      isActive ? "text-primary bg-muted" : "text-foreground/80",
-                    )
+                    cn("rounded-md px-3 py-3 text-sm font-medium", isActive ? "bg-muted text-primary" : "text-foreground/80")
                   }
                 >
                   {l.label}
                 </NavLink>
               ))}
               <Link to="/onboard" onClick={() => setOpen(false)} className="px-3 py-3 text-sm font-medium text-primary">
-                {t("list_business")} →
+                {t("list_business")} -&gt;
               </Link>
-              <button onClick={() => setLang(lang === "en" ? "ta" : "en")} className="px-3 py-3 text-sm font-medium text-left">
-                🌐 {lang === "en" ? "தமிழில் காண" : "View in English"}
+              <button onClick={(e) => { setOpen(false); handleAdminClick(e); }} className="px-3 py-3 text-left text-sm font-medium text-primary">
+                {isAdminLoggedIn ? "Admin Dashboard" : "Admin Login"}
+              </button>
+              <button onClick={() => setLang(lang === "en" ? "ta" : "en")} className="px-3 py-3 text-left text-sm font-medium">
+                {lang === "en" ? "தமிழ் பதிப்பிற்கு மாறவும் (Tamil)" : "Switch to English"}
               </button>
             </div>
           </nav>
         )}
       </header>
 
+      <AdminLoginModal
+        isOpen={showAdminModal}
+        onClose={() => setShowAdminModal(false)}
+        onSuccess={() => {
+          setIsAdminLoggedIn(true);
+          nav("/admin");
+        }}
+      />
+
+
       {showSearch && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-start justify-center pt-32 px-4" onClick={() => setShowSearch(false)}>
-          <form
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={submitSearch}
-            className="w-full max-w-xl bg-card rounded-2xl shadow-elevated border border-border p-4 animate-fade-in-up"
-          >
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 px-4 pt-32 backdrop-blur-md" onClick={() => setShowSearch(false)}>
+          <form onClick={(e) => e.stopPropagation()} onSubmit={submitSearch} className="w-full max-w-xl animate-fade-in-up rounded-2xl border border-border bg-card p-4 shadow-elevated">
             <div className="flex items-center gap-3">
               <Search className="h-5 w-5 text-muted-foreground" />
-              <input
-                autoFocus
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder={t("search_placeholder")}
-                className="flex-1 bg-transparent text-lg focus:outline-none"
-              />
-              <button type="button" onClick={() => setShowSearch(false)} className="text-xs text-muted-foreground px-2 py-1 rounded border border-border">ESC</button>
+              <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search_placeholder")} className="flex-1 bg-transparent text-lg focus:outline-none" />
+              <button type="button" onClick={() => setShowSearch(false)} className="rounded border border-border px-2 py-1 text-xs text-muted-foreground">ESC</button>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">Try: "vivekananda", "fish curry", "homestay", "weather"</p>
           </form>
@@ -182,18 +206,18 @@ export default function Navbar() {
       {showEmergency && (
         <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setShowEmergency(false)}>
           <div className="absolute inset-0 bg-foreground/40" />
-          <div onClick={(e) => e.stopPropagation()} className="relative w-full max-w-sm bg-card border-l border-border h-full overflow-y-auto p-6 animate-fade-in-up">
-            <div className="flex items-center justify-between mb-6">
+          <div onClick={(e) => e.stopPropagation()} className="relative h-full w-full max-w-sm animate-fade-in-up overflow-y-auto border-l border-border bg-card p-6">
+            <div className="mb-6 flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-widest text-destructive font-semibold">{t("emergency")}</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-destructive">{t("emergency")}</p>
                 <h3 className="font-display text-2xl font-bold">Quick contacts</h3>
               </div>
-              <button onClick={() => setShowEmergency(false)} className="h-9 w-9 rounded-full hover:bg-muted flex items-center justify-center"><X className="h-4 w-4" /></button>
+              <button onClick={() => setShowEmergency(false)} className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"><X className="h-4 w-4" /></button>
             </div>
             <ul className="space-y-2">
               {emergencyContacts.map((c) => (
-                <a key={c.name} href={`tel:${c.number.replace(/[^0-9]/g, "")}`} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-destructive/40 hover:bg-destructive/5 transition-smooth">
-                  <span className="h-10 w-10 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
+                <a key={c.name} href={`tel:${c.number.replace(/[^0-9]/g, "")}`} className="flex items-center gap-3 rounded-xl border border-border p-3 transition-smooth hover:border-destructive/40 hover:bg-destructive/5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
                     <Phone className="h-4 w-4" />
                   </span>
                   <div className="flex-1">
@@ -203,8 +227,8 @@ export default function Navbar() {
                 </a>
               ))}
             </ul>
-            <div className="mt-6 p-4 rounded-xl gradient-warm border border-border text-sm text-muted-foreground">
-              Save this page offline before you travel — access these numbers without network.
+            <div className="gradient-warm mt-6 rounded-xl border border-border p-4 text-sm text-muted-foreground">
+              Save this page offline before you travel - access these numbers without network.
             </div>
           </div>
         </div>

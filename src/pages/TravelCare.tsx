@@ -1,67 +1,37 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Search, MessageCircle, Eye, UserPlus, LogIn, Send, Phone, CheckCircle2 } from "lucide-react";
-import { emergencyContacts } from "@/data/food";
+import { CheckCircle2, LogIn, LogOut, MessageCircle, Search, Send, UserPlus } from "lucide-react";
 
-type Query = {
+type Priority = "High" | "Normal";
+type Category = "Emergency" | "Transport" | "Stay" | "Places" | "Shopping" | "General";
+
+type TravelCareUser = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+};
+
+type TravelCareReply = {
+  id: string;
+  message: string;
+  date: string;
+};
+
+type TravelCareQuery = {
   id: string;
   subject: string;
   author: string;
-  email?: string;
+  email: string;
+  phone: string;
   message: string;
+  category: Category;
+  priority: Priority;
   date: string;
-  replies: number;
-  views: number;
+  replies: TravelCareReply[];
 };
 
-const initialQueries: Query[] = [
-  {
-    id: "cab-suchindram",
-    subject: "Need cab for Kanyakumari local sightseeing and Suchindram",
-    author: "R. Meenakshi",
-    message: "We are a family of four looking for a local cab route covering the beach, Vivekananda ferry and Suchindram.",
-    date: "06-05-2026 10:15 AM",
-    replies: 2,
-    views: 84,
-  },
-  {
-    id: "ferry-seniors",
-    subject: "Best time for Vivekananda Rock ferry with senior citizens",
-    author: "Amit Sharma",
-    message: "What time should we reach the ferry counter to avoid long queues with elderly parents?",
-    date: "04-05-2026 07:42 PM",
-    replies: 1,
-    views: 112,
-  },
-  {
-    id: "palace-aqueduct",
-    subject: "Padmanabhapuram Palace and Mathur Aqueduct one day plan",
-    author: "S. Pradeep",
-    message: "Can Padmanabhapuram Palace, Mathur Aqueduct and Thirparappu Falls be covered in one day from Kanyakumari?",
-    date: "29-04-2026 01:08 PM",
-    replies: 3,
-    views: 156,
-  },
-  {
-    id: "chitra-rooms",
-    subject: "Rooms near beach for Chitra Pournami visit",
-    author: "Divya Nair",
-    message: "Looking for a stay close to the beach for sunrise and full moon viewing.",
-    date: "24-04-2026 09:30 AM",
-    replies: 1,
-    views: 97,
-  },
-  {
-    id: "souvenir-buying",
-    subject: "Where to buy authentic seashell craft and palm leaf items",
-    author: "Priya Menon",
-    message: "Are beach stalls better or should we go to a craft emporium for seashell souvenirs?",
-    date: "12-04-2026 11:20 AM",
-    replies: 1,
-    views: 75,
-  },
-];
-
-const storageKey = "kaniya-travelcare-queries";
+import { fetchCollection, saveCollection, insertRow, fetchTableRows } from "@/lib/supabaseContent";
 
 const formatDate = () =>
   new Intl.DateTimeFormat("en-GB", {
@@ -71,29 +41,69 @@ const formatDate = () =>
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
-  }).format(new Date()).replace(",", "");
+  })
+    .format(new Date())
+    .replace(",", "");
+
+const classifyQuery = (subject: string, message: string): { category: Category; priority: Priority } => {
+  const text = `${subject} ${message}`.toLowerCase();
+  const highPriorityWords = ["emergency", "urgent", "accident", "unsafe", "lost", "missing", "medical", "hospital", "police", "fraud", "stranded", "harassment", "theft", "injury"];
+
+  if (highPriorityWords.some((word) => text.includes(word))) {
+    return { category: "Emergency", priority: "High" };
+  }
+
+  if (["cab", "taxi", "bus", "train", "ferry", "route", "transport", "parking"].some((word) => text.includes(word))) {
+    return { category: "Transport", priority: "Normal" };
+  }
+
+  if (["hotel", "stay", "room", "homestay", "resort", "booking"].some((word) => text.includes(word))) {
+    return { category: "Stay", priority: "Normal" };
+  }
+
+  if (["shop", "buy", "souvenir", "craft", "market"].some((word) => text.includes(word))) {
+    return { category: "Shopping", priority: "Normal" };
+  }
+
+  if (["visit", "place", "temple", "beach", "palace", "falls", "sightseeing"].some((word) => text.includes(word))) {
+    return { category: "Places", priority: "Normal" };
+  }
+
+  return { category: "General", priority: "Normal" };
+};
 
 export default function TravelCare() {
-  const [queries, setQueries] = useState<Query[]>(initialQueries);
+  const [queries, setQueries] = useState<TravelCareQuery[]>([]);
+  const [users, setUsers] = useState<TravelCareUser[]>([]);
+  const [currentUser, setCurrentUser] = useState<TravelCareUser | null>(null);
+  const [authMode, setAuthMode] = useState<"register" | "login" | null>(null);
+  const [authMessage, setAuthMessage] = useState("");
   const [search, setSearch] = useState("");
-  const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [authForm, setAuthForm] = useState({ name: "", email: "", phone: "", password: "" });
+  const [queryForm, setQueryForm] = useState({ subject: "", message: "" });
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(storageKey);
-    if (saved) {
-      try {
-        setQueries(JSON.parse(saved) as Query[]);
-      } catch {
-        setQueries(initialQueries);
+    async function loadData() {
+      // Fetch users from DB
+      const dbUsers = await fetchTableRows<TravelCareUser>("travelcare_users");
+      const fetchedUsers = dbUsers.length > 0 ? dbUsers : await fetchCollection<TravelCareUser[]>("travelcare_users", []);
+      setUsers(fetchedUsers);
+
+      // Fetch queries from DB
+      const dbQueries = await fetchTableRows<TravelCareQuery>("travelcare_queries");
+      const fetchedQueries = dbQueries.length > 0 ? dbQueries : await fetchCollection<TravelCareQuery[]>("travelcare_queries", []);
+      setQueries(fetchedQueries.filter((q) => q.category && q.priority && Array.isArray(q.replies)));
+
+      // Check current session from Supabase app_content user session
+      const savedUser = await fetchCollection<TravelCareUser | null>("current_user_session", null);
+      if (savedUser) {
+        setCurrentUser(savedUser);
       }
     }
+    loadData();
   }, []);
 
-  useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(queries));
-  }, [queries]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -103,158 +113,226 @@ export default function TravelCare() {
     );
   }, [queries, search]);
 
-  const submitQuery = (event: FormEvent) => {
+  const submitAuth = async (event: FormEvent) => {
     event.preventDefault();
-    if (!form.name.trim() || !form.subject.trim() || !form.message.trim()) return;
+    setAuthMessage("");
+    const email = authForm.email.trim().toLowerCase();
+    const password = authForm.password.trim();
 
-    const next: Query = {
+    if (authMode === "register") {
+      if (!authForm.name.trim() || !email || !authForm.phone.trim() || !password) return;
+      if (users.some((user) => user.email === email)) {
+        setAuthMessage("An account already exists for this email.");
+        return;
+      }
+
+      const nextUser: TravelCareUser = {
+        id: `${Date.now()}`,
+        name: authForm.name.trim(),
+        email,
+        phone: authForm.phone.trim(),
+        password,
+      };
+      const updatedUsers = [...users, nextUser];
+      setUsers(updatedUsers);
+      setCurrentUser(nextUser);
+      await saveCollection("travelcare_users", updatedUsers);
+      await saveCollection("current_user_session", nextUser);
+      await insertRow("travelcare_users", nextUser);
+
+      setAuthForm({ name: "", email: "", phone: "", password: "" });
+      setAuthMode(null);
+      return;
+    }
+
+    const match = users.find((user) => user.email === email && user.password === password);
+    if (!match) {
+      setAuthMessage("Email or password does not match.");
+      return;
+    }
+
+    setCurrentUser(match);
+    await saveCollection("current_user_session", match);
+    setAuthForm({ name: "", email: "", phone: "", password: "" });
+    setAuthMode(null);
+  };
+
+  const submitQuery = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!currentUser || !queryForm.subject.trim() || !queryForm.message.trim()) return;
+
+    const classification = classifyQuery(queryForm.subject, queryForm.message);
+    const next: TravelCareQuery = {
       id: `${Date.now()}`,
-      subject: form.subject.trim(),
-      author: form.name.trim(),
-      email: form.email.trim() || undefined,
-      message: form.message.trim(),
+      subject: queryForm.subject.trim(),
+      author: currentUser.name,
+      email: currentUser.email,
+      phone: currentUser.phone,
+      message: queryForm.message.trim(),
+      category: classification.category,
+      priority: classification.priority,
       date: formatDate(),
-      replies: 0,
-      views: 1,
+      replies: [],
     };
 
-    setQueries((current) => [next, ...current]);
-    setForm({ name: "", email: "", subject: "", message: "" });
-    setShowForm(false);
+    const nextQueries = [next, ...queries];
+    setQueries(nextQueries);
+    await saveCollection("travelcare_queries", nextQueries);
+    await insertRow("travelcare_queries", next);
+
+    setQueryForm({ subject: "", message: "" });
     setSubmitted(true);
     window.setTimeout(() => setSubmitted(false), 3000);
   };
+
+  const logout = async () => {
+    setCurrentUser(null);
+    await saveCollection("current_user_session", null);
+  };
+
 
   return (
     <div className="bg-[#f7f7f2]">
       <section className="container mx-auto px-4 py-12">
         <div className="text-sm text-muted-foreground">Home / Travel Care</div>
-        <div className="mt-6 grid lg:grid-cols-[1fr_340px] gap-8">
-          <main className="bg-white border border-border">
-            <div className="p-6 md:p-8 border-b border-border">
-              <h1 className="font-display text-4xl md:text-5xl font-bold">Travel Care</h1>
-              <p className="mt-4 text-muted-foreground leading-relaxed max-w-3xl">
-                General queries and answers regarding commonly asked questions can be posted here. Ask about taxi or cab availability, best time to visit, destination routes, activities, ferry timing and local shopping.
-              </p>
-            </div>
-
-            <div className="p-4 md:p-6 border-b border-border flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap gap-2">
-                <button className="inline-flex items-center gap-2 bg-[#1f5f3b] px-4 py-2 text-sm font-semibold text-white">
-                  <UserPlus className="h-4 w-4" /> Register
-                </button>
-                <button className="inline-flex items-center gap-2 border border-border bg-white px-4 py-2 text-sm font-semibold">
-                  <LogIn className="h-4 w-4" /> Login
-                </button>
+        <div className="mt-6">
+          <main className="border border-border bg-white">
+            <div className="border-b border-border p-6 md:p-8">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h1 className="font-display text-4xl font-bold md:text-5xl">Travel Care</h1>
+                  <p className="mt-4 max-w-3xl leading-relaxed text-muted-foreground">
+                    Register or login, submit a travel query, and track official replies from the TravelCare admin desk.
+                  </p>
+                </div>
               </div>
-              <form className="relative w-full md:max-w-sm" onSubmit={(e) => e.preventDefault()}>
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search Keyword"
-                  className="w-full border border-border bg-[#fafafa] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-[#1f5f3b]"
-                />
-              </form>
             </div>
 
-            <div className="p-4 md:p-6 border-b border-border flex flex-wrap items-center gap-3">
-              <button onClick={() => setSearch("")} className="bg-[#e8e0cf] px-4 py-2 text-sm font-semibold text-[#332513]">List All</button>
-              <button onClick={() => setShowForm((open) => !open)} className="inline-flex items-center gap-2 bg-[#d9a441] px-4 py-2 text-sm font-semibold text-[#241707]">
-                <Send className="h-4 w-4" /> Submit new query
-              </button>
-              {submitted && (
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#1f5f3b]">
-                  <CheckCircle2 className="h-4 w-4" /> Query submitted
-                </span>
-              )}
+            <div className="border-b border-border p-4 md:p-6">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  {currentUser ? (
+                    <>
+                      <span className="bg-[#e8e0cf] px-4 py-2 text-sm font-semibold text-[#332513]">Signed in as {currentUser.name}</span>
+                      <button onClick={logout} className="inline-flex items-center gap-2 border border-border bg-white px-4 py-2 text-sm font-semibold">
+                        <LogOut className="h-4 w-4" /> Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => setAuthMode("register")} className="inline-flex items-center gap-2 bg-[#1f5f3b] px-4 py-2 text-sm font-semibold text-white">
+                        <UserPlus className="h-4 w-4" /> Register
+                      </button>
+                      <button onClick={() => setAuthMode("login")} className="inline-flex items-center gap-2 border border-border bg-white px-4 py-2 text-sm font-semibold">
+                        <LogIn className="h-4 w-4" /> Login
+                      </button>
+                    </>
+                  )}
+                </div>
+                <form className="relative w-full md:max-w-sm" onSubmit={(e) => e.preventDefault()}>
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search queries"
+                    className="w-full border border-border bg-[#fafafa] py-2.5 pl-10 pr-3 text-sm outline-none focus:border-[#1f5f3b]"
+                  />
+                </form>
+              </div>
             </div>
 
-            {showForm && (
-              <form onSubmit={submitQuery} className="border-b border-border bg-[#fbfaf5] p-5 md:p-6">
-                <div className="grid md:grid-cols-2 gap-4">
+            {authMode && (
+              <form onSubmit={submitAuth} className="border-b border-border bg-[#fbfaf5] p-5 md:p-6">
+                <h2 className="font-display text-2xl font-bold">{authMode === "register" ? "Register" : "Login"}</h2>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {authMode === "register" && (
+                    <label className="text-sm font-semibold">
+                      Name *
+                      <input value={authForm.name} onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
+                    </label>
+                  )}
                   <label className="text-sm font-semibold">
-                    Name *
-                    <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
+                    Email *
+                    <input type="email" value={authForm.email} onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
                   </label>
+                  {authMode === "register" && (
+                    <label className="text-sm font-semibold">
+                      Phone *
+                      <input value={authForm.phone} onChange={(e) => setAuthForm({ ...authForm, phone: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
+                    </label>
+                  )}
                   <label className="text-sm font-semibold">
-                    Email
-                    <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
+                    Password *
+                    <input type="password" value={authForm.password} onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
                   </label>
                 </div>
-                <label className="mt-4 block text-sm font-semibold">
-                  Subject *
-                  <input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
-                </label>
-                <label className="mt-4 block text-sm font-semibold">
-                  Query *
-                  <textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
-                </label>
+                {authMessage && <p className="mt-3 text-sm font-semibold text-red-700">{authMessage}</p>}
                 <div className="mt-4 flex gap-3">
-                  <button type="submit" className="bg-[#1f5f3b] px-5 py-2 text-sm font-semibold text-white">Submit</button>
-                  <button type="button" onClick={() => setShowForm(false)} className="border border-border px-5 py-2 text-sm font-semibold">Cancel</button>
+                  <button type="submit" className="bg-[#1f5f3b] px-5 py-2 text-sm font-semibold text-white">Continue</button>
+                  <button type="button" onClick={() => setAuthMode(null)} className="border border-border px-5 py-2 text-sm font-semibold">Cancel</button>
                 </div>
               </form>
             )}
 
-            <div className="hidden md:grid grid-cols-[1fr_110px_110px] border-b border-border bg-[#f0eadf] px-6 py-3 text-sm font-bold text-[#362b1f]">
+            <form onSubmit={submitQuery} className="border-b border-border p-5 md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-display text-2xl font-bold">Submit a query</h2>
+                {submitted && (
+                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#1f5f3b]">
+                    <CheckCircle2 className="h-4 w-4" /> Query submitted
+                  </span>
+                )}
+              </div>
+              {!currentUser ? (
+                <p className="mt-3 text-sm text-muted-foreground">Please register or login to post a TravelCare query.</p>
+              ) : (
+                <>
+                  <label className="mt-4 block text-sm font-semibold">
+                    Subject *
+                    <input value={queryForm.subject} onChange={(e) => setQueryForm({ ...queryForm, subject: e.target.value })} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
+                  </label>
+                  <label className="mt-4 block text-sm font-semibold">
+                    Query *
+                    <textarea value={queryForm.message} onChange={(e) => setQueryForm({ ...queryForm, message: e.target.value })} rows={4} className="mt-1 w-full border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[#1f5f3b]" />
+                  </label>
+                  <button type="submit" className="mt-4 inline-flex items-center gap-2 bg-[#d9a441] px-5 py-2 text-sm font-semibold text-[#241707]">
+                    <Send className="h-4 w-4" /> Submit
+                  </button>
+                </>
+              )}
+            </form>
+
+            <div className="hidden grid-cols-[1fr_110px] border-b border-border bg-[#f0eadf] px-6 py-3 text-sm font-bold text-[#362b1f] md:grid">
               <span>Subject</span>
               <span>Replies</span>
-              <span>Views</span>
             </div>
 
             <div>
               {filtered.map((q) => (
-                <article key={q.id} className="grid gap-4 border-b border-border p-5 md:grid-cols-[1fr_110px_110px] md:px-6">
+                <article key={q.id} className="grid gap-4 border-b border-border p-5 md:grid-cols-[1fr_110px] md:px-6">
                   <div>
                     <h2 className="font-display text-xl font-semibold text-[#1f5f3b]">{q.subject}</h2>
-                    <p className="mt-2 text-sm text-muted-foreground">{q.author}</p>
-                    <p className="text-xs text-muted-foreground">{q.date}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{q.author} - {q.date}</p>
                     <p className="mt-3 text-sm leading-relaxed text-[#5f594e]">{q.message}</p>
+                    {q.replies.length > 0 && (
+                      <div className="mt-4 space-y-2">
+                        {q.replies.map((reply) => (
+                          <div key={reply.id} className="border-l-4 border-[#1f5f3b] bg-[#f7f7f2] p-3">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-[#1f5f3b]">Admin reply - {reply.date}</p>
+                            <p className="mt-1 text-sm text-[#4d463b]">{reply.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                    <MessageCircle className="h-4 w-4 text-[#1f5f3b]" /> {q.replies} Replies
-                  </div>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                    <Eye className="h-4 w-4 text-[#1f5f3b]" /> {q.views} Views
+                    <MessageCircle className="h-4 w-4 text-[#1f5f3b]" /> {q.replies.length}
                   </div>
                 </article>
               ))}
-              {filtered.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No matching queries.</p>}
+              {filtered.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No queries have been submitted yet.</p>}
             </div>
-
-            <p className="p-5 text-sm text-muted-foreground">
-              Kindly verify offers by contacting service providers directly before booking.
-            </p>
           </main>
-
-          <aside className="space-y-5">
-            <div className="bg-white border border-border p-6">
-              <h2 className="font-display text-2xl font-bold">Helplines</h2>
-              <div className="mt-4 grid gap-2">
-                {emergencyContacts.map((c) => (
-                  <a key={c.name} href={`tel:${c.number.replace(/[^0-9]/g, "")}`} className="flex items-center gap-3 border border-border p-3 hover:border-[#1f5f3b]">
-                    <Phone className="h-4 w-4 text-[#1f5f3b]" />
-                    <span className="text-sm">
-                      <span className="block text-muted-foreground">{c.name}</span>
-                      <span className="font-semibold">{c.number}</span>
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </div>
-            <div className="bg-[#1f5f3b] p-6 text-white">
-              <h2 className="font-display text-2xl font-bold">Travel Hub</h2>
-              <ul className="mt-4 space-y-2 text-sm text-white/85">
-                <li>Where to go</li>
-                <li>Plan your trip</li>
-                <li>Things to buy</li>
-                <li>Events</li>
-                <li>E-brochures</li>
-                <li>FAQs</li>
-              </ul>
-            </div>
-          </aside>
         </div>
       </section>
     </div>

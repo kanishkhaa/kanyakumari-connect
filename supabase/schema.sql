@@ -37,16 +37,61 @@ create table if not exists public.reviews (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.travelcare_queries (
+  id text primary key,
+  subject text not null,
+  author text not null,
+  email text not null,
+  phone text not null,
+  message text not null,
+  category text not null,
+  priority text not null,
+  date text not null,
+  replies jsonb not null default '[]'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.travelcare_users (
+  id text primary key,
+  name text not null,
+  email text not null unique,
+  phone text not null,
+  password text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.admin_sessions (
+  token text primary key,
+  username text not null,
+  authenticated_at timestamptz not null default now()
+);
+
+create table if not exists public.user_settings (
+  key text primary key,
+  value text not null,
+  updated_at timestamptz not null default now()
+);
+
 alter table public.app_content enable row level security;
 alter table public.vendor_applications enable row level security;
 alter table public.bookings enable row level security;
 alter table public.reviews enable row level security;
+alter table public.travelcare_queries enable row level security;
+alter table public.travelcare_users enable row level security;
+alter table public.admin_sessions enable row level security;
+alter table public.user_settings enable row level security;
 
 drop policy if exists "Read public content" on public.app_content;
 create policy "Read public content" on public.app_content for select using (true);
 
+drop policy if exists "Write public content" on public.app_content;
+create policy "Write public content" on public.app_content for all using (true);
+
 drop policy if exists "Submit vendor applications" on public.vendor_applications;
 create policy "Submit vendor applications" on public.vendor_applications for insert with check (true);
+
+drop policy if exists "Read vendor applications" on public.vendor_applications;
+create policy "Read vendor applications" on public.vendor_applications for select using (true);
 
 drop policy if exists "Submit bookings" on public.bookings;
 create policy "Submit bookings" on public.bookings for insert with check (true);
@@ -56,6 +101,19 @@ create policy "Read reviews" on public.reviews for select using (true);
 
 drop policy if exists "Submit reviews" on public.reviews;
 create policy "Submit reviews" on public.reviews for insert with check (true);
+
+drop policy if exists "Access queries" on public.travelcare_queries;
+create policy "Access queries" on public.travelcare_queries for all using (true);
+
+drop policy if exists "Access travelcare users" on public.travelcare_users;
+create policy "Access travelcare users" on public.travelcare_users for all using (true);
+
+drop policy if exists "Access admin sessions" on public.admin_sessions;
+create policy "Access admin sessions" on public.admin_sessions for all using (true);
+
+drop policy if exists "Access user settings" on public.user_settings;
+create policy "Access user settings" on public.user_settings for all using (true);
+
 
 insert into public.app_content (collection_key, payload)
 values
