@@ -2,8 +2,6 @@
 
 Kaniya is a modern tourism discovery and planning platform for Kanniyakumari/Kanyakumari. It brings together places to visit, trip planning, stays, local experiences, food, festivals, official tourism contacts, emergency support, eBrochures, tour operators, photo/video galleries, and locally relevant things to buy in one responsive web application.
 
-The project is built as a frontend-first React application with local fallback datasets and optional Supabase-backed dynamic content. It is designed to work reliably in local development while still supporting production content updates through the database.
-
 ## Highlights
 
 - Cinematic landing page with rotating hero sections for spiritual, beach, heritage, and nature travel themes.
@@ -116,38 +114,6 @@ Important routes:
 /search                   Global search
 /onboard                  Vendor onboarding
 ```
-
-### Data Layer
-
-Most content lives in `src/data/*.ts` as typed local fallback data. Pages that support live content use `useCollection(collectionKey, fallback)` from `src/hooks/useCollection.ts`.
-
-The hook calls `fetchCollection` from `src/lib/supabaseContent.ts`:
-
-1. If Supabase is configured, fetch `payload` from `public.app_content`.
-2. If Supabase is unavailable, not configured, empty, or errors, use the local fallback.
-
-This keeps the app useful offline and during development while allowing production content to be updated from Supabase.
-
-Current Supabase-style collection keys include:
-
-```text
-stays
-operators
-events
-places
-products
-```
-
-### Persistence Layer
-
-Some user-generated or demo interactions are stored locally:
-
-- Vendor stays and operators
-- Listing reviews
-- TravelCare queries
-
-This is handled through `src/lib/localMarketplace.ts` and direct `localStorage` usage in page-level flows.
-
 ### Serverless API
 
 `api/nearby.js` provides a Vercel serverless endpoint:
@@ -239,8 +205,6 @@ The Things to Buy page highlights realistic Kanyakumari purchases:
 - Clove, pepper, cinnamon, and masala packets
 - Handloom textiles and cotton dhotis
 
-Product images are mapped through `productImage()` so local uploaded `buy-*` assets can be used consistently across Things to Buy, Marketplace, and Search.
-
 ### Tour Operators
 
 The operators page lists realistic operator contacts and websites. It avoids fake rating inflation and invites users to contact providers directly.
@@ -293,17 +257,6 @@ Tables:
 
 Row Level Security is enabled with public read/insert policies appropriate for demo/public submission flows.
 
-## Environment Variables
-
-Supabase is optional. Without these variables, the app uses local fallback content.
-
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-If `VITE_SUPABASE_ANON_KEY` is missing, `fetchCollection` returns fallback data.
-
 ## Getting Started
 
 ### Prerequisites
@@ -324,93 +277,3 @@ npm run dev
 ```
 
 The Vite config defaults to port `8080`.
-
-### Build
-
-```bash
-npm run build
-```
-
-### Preview Production Build
-
-```bash
-npm run preview
-```
-
-### Run Tests
-
-```bash
-npm test
-```
-
-### Lint
-
-```bash
-npm run lint
-```
-
-## Deployment
-
-The project includes `vercel.json` for Vercel deployment:
-
-- SPA routes rewrite to `index.html`.
-- `api/nearby.js` is configured as a serverless function with a 20-second max duration.
-
-For production:
-
-1. Configure Supabase environment variables if live content is required.
-2. Apply `supabase/schema.sql` to the Supabase project.
-3. Deploy to Vercel or any static host that supports SPA fallback routing.
-
-## Content Management Notes
-
-- Add local fallback records in `src/data`.
-- Add official or uploaded images in `src/assets`.
-- For Things to Buy images, import the asset in `src/data/marketplace.ts` and map it in `productImages`.
-- For live content, update `public.app_content.payload` in Supabase with the matching collection key.
-- Keep official contact and emergency data source-linked whenever possible.
-
-## Design System
-
-The visual system is defined in `src/index.css` using CSS variables and Tailwind utilities.
-
-Main design elements:
-
-- Warm sand backgrounds
-- Sunset orange primary color
-- Ocean teal secondary color
-- Editorial serif headings
-- Rounded cards and soft shadows
-- Responsive grids and mobile-friendly sections
-
-Reusable components live under `src/components/ui`, with layout-level composition in `src/components/layout`.
-
-## Quality and Verification
-
-Recommended checks before shipping:
-
-```bash
-npm run build
-npm run lint
-npm test
-```
-
-For visual changes, verify at minimum:
-
-- Home page hero and timeline
-- Places listing and detail page
-- Things to Buy and Marketplace image mapping
-- Navbar SOS drawer
-- Mobile navigation
-- `/operators`, `/dtpc`, and `/ebrochures`
-
-## Known Considerations
-
-- Some user-generated data is stored in `localStorage` for demo behavior.
-- Supabase content is optional and falls back to local data.
-- Nearby discovery depends on Overpass API availability.
-- Several UI packages are installed for future expansion, though not every package is used on every page.
-
-## License
-
-This project is private unless a license is added by the project owner.
