@@ -1,10 +1,12 @@
 import { imageFor, stayImages } from "@/data/imageRegistry";
 import stayPlaceholder from "@/assets/stay-hotel.jpg";
 
+export type StayType = "Homestay" | "Eco Lodge" | "Hotel" | "Tribal Stay";
+
 export type Stay = {
   id: string;
   name: string;
-  type: "Homestay" | "Eco Lodge" | "Hotel" | "Tribal Stay";
+  type: StayType;
   image: string;
   location: string;
   pricePerNight: number;
@@ -13,77 +15,65 @@ export type Stay = {
   amenities: string[];
   verified: boolean;
   description: string;
+  /** Direct Google Maps search URL. */
+  mapLink?: string;
+  /** Included only when a property has an identifiable official site. */
+  website?: string;
+  /** Publicly listed contact number, formatted for a tel: link. */
+  phone?: string;
+  featured?: boolean;
+  distanceFromBeach?: string;
+  distanceFromStation?: string;
+  roomType?: string;
+  checkIn?: string;
+  checkOut?: string;
+  /** An official direct-booking page when one is available. */
+  bookingLink?: string;
 };
 
-const makeStay = (stay: Omit<Stay, "image"> & { image?: string }): Stay => ({
+type StayInput = Omit<Stay, "image" | "mapLink"> & { image?: string; mapLink?: string };
+
+const maps = (name: string) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, Kanyakumari, Tamil Nadu`)}`;
+
+const makeStay = (stay: StayInput): Stay => ({
   ...stay,
   image: stay.image ?? imageFor(stayImages, stay.id, stayPlaceholder),
+  mapLink: stay.mapLink ?? maps(stay.name),
 });
 
+// Prices, editorial scores and distances are planning estimates for this demo, not live
+// availability, traveller-review data or third-party booking-platform content.
 export const stays: Stay[] = [
-  makeStay({
-    id: "annai-resorts-spa",
-    name: "Annai Resorts & Spa",
-    type: "Hotel",
-    location: "Kovalam Road, Kanyakumari",
-    pricePerNight: 5200,
-    rating: 4.6,
-    reviews: 1240,
-    amenities: ["Sea view villas", "Pool", "Spa", "Restaurant"],
-    verified: true,
-    description:
-      "A well-known resort close to the seafront with sea-facing rooms and easy access to sunrise, sunset and ferry attractions.",
-  }),
-  makeStay({
-    id: "sparsa-resorts-kanyakumari",
-    name: "Sparsa Resorts Kanyakumari",
-    type: "Eco Lodge",
-    location: "Beach Road near Sunset Point, Kanyakumari",
-    pricePerNight: 4800,
-    rating: 4.5,
-    reviews: 980,
-    amenities: ["Ocean views", "Eco-friendly", "Restaurant", "Parking"],
-    verified: true,
-    description:
-      "A popular resort near the ocean and sunset viewing area, known for comfortable rooms and proximity to the main town sights.",
-  }),
-  makeStay({
-    id: "hotel-sea-view",
-    name: "Hotel Sea View",
-    type: "Hotel",
-    location: "East Car Street / Beach area, Kanyakumari",
-    pricePerNight: 3600,
-    rating: 4.3,
-    reviews: 860,
-    amenities: ["Sea-facing rooms", "Restaurant", "Family rooms", "Walkable location"],
-    verified: true,
-    description:
-      "A central hotel option for travellers who want quick access to Kumari Amman Temple, the ferry point and beach viewpoints.",
-  }),
-  makeStay({
-    id: "hotel-temple-citi",
-    name: "Hotel Temple Citi",
-    type: "Hotel",
-    location: "Near Kanyakumari Temple and railway station",
-    pricePerNight: 2400,
-    rating: 4.2,
-    reviews: 640,
-    amenities: ["Family rooms", "Restaurant", "Parking", "Budget friendly"],
-    verified: true,
-    description:
-      "A popular town hotel for temple visits, short stays and budget-conscious families who prefer central access.",
-  }),
-  makeStay({
-    id: "hotel-sangam",
-    name: "Hotel Sangam",
-    type: "Hotel",
-    location: "Main Road, Kanyakumari",
-    pricePerNight: 3000,
-    rating: 4.2,
-    reviews: 710,
-    amenities: ["Restaurant", "AC rooms", "Central location", "Travel desk"],
-    verified: true,
-    description:
-      "A long-running hotel choice in Kanyakumari town with convenient road access to beaches, ferry services and local shopping.",
-  }),
+  makeStay({ id: "annai-resorts-spa", name: "Annai Resorts & Spa", type: "Hotel", location: "Kovalam Road, Kanyakumari", pricePerNight: 5600, rating: 4.7, reviews: 320, featured: true, verified: true, distanceFromBeach: "15 m", distanceFromStation: "1.8 km", roomType: "Premium Sea View Villa", checkIn: "2:00 PM", checkOut: "12:00 PM", amenities: ["Pool", "Spa", "Restaurant", "Free Wi-Fi", "Sea view"], website: "https://annairesorts.com/", bookingLink: "https://annairesorts.com/", phone: "+919488246666", description: "A landscaped seafront resort on Kovalam Road, suited to travellers seeking generous rooms, wellness facilities and an easy walk to the cape." }),
+  makeStay({ id: "sparsa-resorts-kanyakumari", name: "Sparsa Resorts Kanyakumari", type: "Eco Lodge", location: "Beach Road, Kanyakumari", pricePerNight: 5100, rating: 4.5, reviews: 250, featured: true, verified: true, distanceFromBeach: "250 m", distanceFromStation: "2.4 km", roomType: "Garden Villa", checkIn: "2:00 PM", checkOut: "12:00 PM", amenities: ["Garden", "Restaurant", "Parking", "Free Wi-Fi"], website: "https://sparsaresorts.com/", description: "A calm, low-rise resort option near the coast, with green surroundings and a relaxed base for sightseeing around town." }),
+  makeStay({ id: "hotel-sea-view", name: "Hotel Sea View", type: "Hotel", location: "East Car Street, Kanyakumari", pricePerNight: 3600, rating: 4.3, reviews: 190, featured: true, verified: true, distanceFromBeach: "200 m", distanceFromStation: "1.1 km", roomType: "Deluxe Sea View Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Room service", "Parking", "Travel desk"], website: "https://hotelseaview.in/", bookingLink: "https://hotelseaview.in/", phone: "+919489474968", description: "A centrally placed hotel close to the beach, temple streets and ferry area, with rooms designed for short coastal stays." }),
+  makeStay({ id: "hotel-temple-citi", name: "Hotel Temple Citi", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 2400, rating: 4.1, reviews: 130, featured: false, verified: true, distanceFromBeach: "800 m", distanceFromStation: "650 m", roomType: "Standard Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Family rooms", "Parking", "Reception", "Air conditioning"], description: "A practical town stay for temple visits and rail travellers, with straightforward rooms close to everyday services." }),
+  makeStay({ id: "hotel-sangam", name: "Hotel Sangam", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 3000, rating: 4.1, reviews: 145, featured: false, verified: true, distanceFromBeach: "750 m", distanceFromStation: "1 km", roomType: "Deluxe Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Air conditioning", "Travel desk", "Parking"], description: "A central option for visitors who value road access, nearby shops and a convenient starting point for local attractions." }),
+  makeStay({ id: "hotel-sea-face", name: "Hotel Sea Face", type: "Hotel", location: "Beach Road, Kanyakumari", pricePerNight: 4100, rating: 4.3, reviews: 210, featured: true, verified: true, distanceFromBeach: "100 m", distanceFromStation: "1.5 km", roomType: "Ocean View Room", checkIn: "1:00 PM", checkOut: "11:00 AM", amenities: ["Ocean view", "Restaurant", "Lift", "Room service"], website: "https://www.hotelseaface.com/", bookingLink: "https://www.hotelseaface.com/", description: "A beach-road property for travellers who want the promenade and coastal viewpoints within a short walk." }),
+  makeStay({ id: "hotel-sea-land", name: "Hotel Sea Land", type: "Hotel", location: "Near Sunrise Point, Kanyakumari", pricePerNight: 3300, rating: 4.2, reviews: 165, featured: true, verified: true, distanceFromBeach: "100 m", distanceFromStation: "1.2 km", roomType: "AC Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Air conditioning", "Wi-Fi", "Laundry", "Sea access"], website: "https://hotelsealand.com/", description: "A simple beachside base near Sunrise Point, with comfortable rooms for couples and families exploring the southern tip." }),
+  makeStay({ id: "hotel-singaar-international", name: "Hotel Singaar International", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 3400, rating: 4.0, reviews: 170, featured: false, verified: true, distanceFromBeach: "650 m", distanceFromStation: "900 m", roomType: "Executive Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Parking", "Conference space", "Room service"], description: "A full-service town hotel with enough space for families, groups and travellers arriving by road." }),
+  makeStay({ id: "hotel-jebasakthy", name: "Hotel Jebasakthy", type: "Hotel", location: "East Car Street, Kanyakumari", pricePerNight: 2600, rating: 4.0, reviews: 120, featured: false, verified: true, distanceFromBeach: "450 m", distanceFromStation: "900 m", roomType: "Deluxe Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Parking", "Family rooms", "Lift", "Air conditioning"], description: "An accessible choice around East Car Street, well placed for the temple area, markets and beach-side walks." }),
+  makeStay({ id: "hotel-samudra", name: "Hotel Samudra", type: "Hotel", location: "East Car Street, Kanyakumari", pricePerNight: 2700, rating: 4.0, reviews: 115, featured: false, verified: true, distanceFromBeach: "400 m", distanceFromStation: "850 m", roomType: "Family Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Parking", "Travel desk", "Family rooms"], description: "A family-oriented hotel in the lively temple quarter, convenient for visitors planning a compact sightseeing itinerary." }),
+  makeStay({ id: "hotel-sun-park", name: "Hotel Sun Park", type: "Hotel", location: "Beach Road, Kanyakumari", pricePerNight: 2800, rating: 3.9, reviews: 100, featured: false, verified: true, distanceFromBeach: "300 m", distanceFromStation: "1.3 km", roomType: "Standard AC Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Air conditioning", "Parking", "Reception", "Wi-Fi"], description: "A no-fuss coastal stay for guests who prefer being close to Beach Road and the sunset promenade." }),
+  makeStay({ id: "new-cape-hotel", name: "New Cape Hotel", type: "Hotel", location: "Near Railway Station, Kanyakumari", pricePerNight: 2300, rating: 3.9, reviews: 95, featured: false, verified: true, distanceFromBeach: "950 m", distanceFromStation: "350 m", roomType: "Standard Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Parking", "Lift", "Room service", "Air conditioning"], description: "A useful pick for rail arrivals, with essential facilities and an easy onward route to the town centre." }),
+  makeStay({ id: "ramraj-regency", name: "Ramraj Regency", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 2900, rating: 4.0, reviews: 110, featured: false, verified: true, distanceFromBeach: "700 m", distanceFromStation: "950 m", roomType: "Premium Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Wi-Fi", "Parking", "Conference room"], description: "A modern, centrally located hotel for leisure trips and small groups who want straightforward access to town." }),
+  makeStay({ id: "hotel-tri-sea", name: "Hotel Tri Sea", type: "Hotel", location: "Beach Road, Kanyakumari", pricePerNight: 3900, rating: 4.2, reviews: 160, featured: true, verified: true, distanceFromBeach: "150 m", distanceFromStation: "1.4 km", roomType: "Sea View Room", checkIn: "1:00 PM", checkOut: "11:00 AM", amenities: ["Sea view", "Restaurant", "Parking", "Room service"], description: "A beachfront address near the three-seas viewpoint, ideal for visitors who want to begin mornings beside the water." }),
+  makeStay({ id: "ttdc-hotel-tamilnadu", name: "Hotel Tamil Nadu", type: "Hotel", location: "Kovalam Road, Kanyakumari", pricePerNight: 3200, rating: 4.0, reviews: 150, featured: false, verified: true, distanceFromBeach: "350 m", distanceFromStation: "2 km", roomType: "Standard AC Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Parking", "Garden", "Reception"], description: "A government tourism hotel with a spacious setting on the Kovalam Road side of town, convenient for sightseeing plans." }),
+  makeStay({ id: "hotel-gopinivas-grand", name: "The Gopinivas Grand", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 3500, rating: 4.1, reviews: 155, featured: false, verified: true, distanceFromBeach: "600 m", distanceFromStation: "800 m", roomType: "Deluxe King Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Parking", "Wi-Fi", "Room service"], description: "A polished town hotel balancing comfortable rooms with a central location for beaches, ferries and local dining." }),
+  makeStay({ id: "hotel-wins", name: "Hotel Wins", type: "Hotel", location: "Kovalam Road, Kanyakumari", pricePerNight: 2500, rating: 3.9, reviews: 90, featured: false, verified: true, distanceFromBeach: "500 m", distanceFromStation: "1.8 km", roomType: "Deluxe AC Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Wi-Fi", "Parking", "Air conditioning", "Family rooms"], description: "A compact hotel on the Kovalam Road side, offering an uncomplicated base for couples and families." }),
+  makeStay({ id: "hotel-anand", name: "Hotel Anand", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 2100, rating: 3.8, reviews: 82, featured: false, verified: true, distanceFromBeach: "850 m", distanceFromStation: "750 m", roomType: "Economy Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Parking", "Reception", "Family rooms", "Air conditioning"], description: "A budget-conscious central stay for guests looking to spend their time exploring rather than staying indoors." }),
+  makeStay({ id: "hotel-raghavi-tourist-home", name: "Raghavi Tourist Home", type: "Hotel", location: "Near Bus Stand, Kanyakumari", pricePerNight: 1800, rating: 3.8, reviews: 72, featured: false, verified: true, distanceFromBeach: "1 km", distanceFromStation: "700 m", roomType: "Standard Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Reception", "Parking", "Family rooms", "Local guidance"], description: "A modest accommodation choice near transport connections, suited to short stays and practical travel plans." }),
+  makeStay({ id: "manickam-tourist-home", name: "Manickam Tourist Home", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 1900, rating: 3.8, reviews: 70, featured: false, verified: true, distanceFromBeach: "900 m", distanceFromStation: "800 m", roomType: "Standard Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Parking", "Reception", "Family rooms", "Air conditioning"], description: "A value-led town option with essential comforts and walkable access to daily necessities and local transport." }),
+  makeStay({ id: "hotel-rani-residency", name: "Rani Residency", type: "Hotel", location: "Near Bus Stand, Kanyakumari", pricePerNight: 2200, rating: 3.9, reviews: 88, featured: false, verified: true, distanceFromBeach: "900 m", distanceFromStation: "650 m", roomType: "Deluxe Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Wi-Fi", "Parking", "Lift", "Family rooms"], description: "A convenient stay for guests arriving by bus, with practical rooms and quick access to the centre of Kanyakumari." }),
+  makeStay({ id: "hotel-coral-kanyakumari", name: "The Coral Kanyakumari", type: "Hotel", location: "Kovalam Road, Kanyakumari", pricePerNight: 3700, rating: 4.1, reviews: 140, featured: false, verified: true, distanceFromBeach: "300 m", distanceFromStation: "2 km", roomType: "Premium Double Room", checkIn: "1:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Parking", "Wi-Fi", "Room service"], description: "A contemporary coastal hotel with a quieter Kovalam Road setting, while still close to the principal sightseeing circuit." }),
+  makeStay({ id: "hotel-jeyam", name: "Hotel Jeyam", type: "Hotel", location: "Near Bus Stand, Kanyakumari", pricePerNight: 2000, rating: 3.8, reviews: 76, featured: false, verified: true, distanceFromBeach: "950 m", distanceFromStation: "700 m", roomType: "Standard AC Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Parking", "Room service", "Family rooms", "Wi-Fi"], description: "A straightforward lodging option for visitors seeking a central, economical room and easy transport access." }),
+  makeStay({ id: "hotel-viswa-grand", name: "Hotel Viswa Grand", type: "Hotel", location: "Main Road, Kanyakumari", pricePerNight: 3100, rating: 4.0, reviews: 125, featured: false, verified: true, distanceFromBeach: "750 m", distanceFromStation: "950 m", roomType: "Executive Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Wi-Fi", "Parking", "Conference hall"], description: "A comfortable hotel for leisure guests and small groups, with modern basics and a convenient main-road address." }),
+  makeStay({ id: "hotel-udupi-international", name: "Hotel Udupi International", type: "Hotel", location: "East Car Street, Kanyakumari", pricePerNight: 2700, rating: 4.0, reviews: 118, featured: false, verified: true, distanceFromBeach: "450 m", distanceFromStation: "850 m", roomType: "Family Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Vegetarian restaurant", "Parking", "Family rooms", "Wi-Fi"], description: "A central choice valued for family rooms and easy access to the temple quarter and shore-side landmarks." }),
+  makeStay({ id: "hotel-jubilee", name: "Hotel Jubilee", type: "Hotel", location: "Near Beach Road, Kanyakumari", pricePerNight: 2500, rating: 3.9, reviews: 92, featured: false, verified: true, distanceFromBeach: "400 m", distanceFromStation: "1.1 km", roomType: "Deluxe Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Restaurant", "Lift", "Parking", "Family rooms"], description: "A comfortable mid-range choice within walking distance of the beach, restaurants and the evening promenade." }),
+  makeStay({ id: "hotel-cape-inn", name: "Cape Inn", type: "Hotel", location: "Near Sunset Point, Kanyakumari", pricePerNight: 2600, rating: 3.9, reviews: 85, featured: false, verified: true, distanceFromBeach: "350 m", distanceFromStation: "1.6 km", roomType: "Standard Double Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Parking", "Wi-Fi", "Room service", "Reception"], description: "A peaceful stay close to Sunset Point, well suited to visitors who enjoy slower evening walks by the coast." }),
+  makeStay({ id: "hotel-ocean-heritage", name: "Ocean Heritage", type: "Hotel", location: "Beach Road, Kanyakumari", pricePerNight: 3400, rating: 4.1, reviews: 135, featured: false, verified: true, distanceFromBeach: "180 m", distanceFromStation: "1.4 km", roomType: "Sea-Facing Room", checkIn: "1:00 PM", checkOut: "11:00 AM", amenities: ["Sea view", "Restaurant", "Wi-Fi", "Parking"], description: "A coastal hotel for travellers who want to spend their time near the beach and catch the changing light over the sea." }),
+  makeStay({ id: "hotel-green-park", name: "Green Park Hotel", type: "Hotel", location: "Near Bus Stand, Kanyakumari", pricePerNight: 2100, rating: 3.8, reviews: 68, featured: false, verified: true, distanceFromBeach: "1 km", distanceFromStation: "700 m", roomType: "Economy Room", checkIn: "12:00 PM", checkOut: "11:00 AM", amenities: ["Parking", "Restaurant", "Wi-Fi", "Travel desk"], description: "An affordable transport-friendly base for guests planning day trips around the district as well as time in Kanyakumari town." }),
+  makeStay({ id: "anantya-resorts", name: "Anantya Resorts", type: "Eco Lodge", location: "Chittar Lake, Kaliel, Kanyakumari District", pricePerNight: 7600, rating: 4.6, reviews: 220, featured: true, verified: true, distanceFromBeach: "45 km", distanceFromStation: "45 km", roomType: "Lake View Cottage", checkIn: "2:00 PM", checkOut: "11:00 AM", amenities: ["Lake view", "Pool", "Restaurant", "Nature activities"], website: "https://anantyaresorts.com/", bookingLink: "https://anantyaresorts.com/", phone: "+919363496964", description: "A lake-side nature retreat in the district for visitors seeking a slower, greener stay beyond Kanyakumari town." }),
+  makeStay({ id: "aanantham-resort", name: "Aanantham Resort", type: "Eco Lodge", location: "Kanyakumari District", pricePerNight: 4300, rating: 4.2, reviews: 105, featured: false, verified: true, distanceFromBeach: "Varies by room", distanceFromStation: "Approx. 5 km", roomType: "Garden Cottage", checkIn: "1:00 PM", checkOut: "11:00 AM", amenities: ["Garden", "Restaurant", "Parking", "Family rooms"], website: "https://www.aananthamresort.com/", description: "A relaxed garden-style resort option for guests who want more space and an unhurried atmosphere outside the busiest waterfront lanes." }),
 ];

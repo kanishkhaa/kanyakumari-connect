@@ -39,8 +39,27 @@ import placeViewTower from "@/assets/place-viewtower.jpg";
 import placeVivekanandhaRock from "@/assets/place-vivekanandharock.jpg";
 import placeWanderingMonkMuseum from "@/assets/place-wanderingmonkmuseum.jpg";
 import staysAnnaiResorts from "@/assets/stays-annairesorts.jpg";
+import anantyaImage from "@/assets/stays-anantya.jpg";
+import staysSeaFace from "@/assets/stays-seaface.jpg";
+import staysSeaLand from "@/assets/stays-sealand.jpg";
+import staysTriSea from "@/assets/stays-triesea.jpg";
 import staysSangam from "@/assets/stays-sangam.jpg";
 import staysSeaView from "@/assets/stays-seaview.jpg";
+import staysCoral from "@/assets/stays-coral.jpg";
+import staysOceanHeritage from "@/assets/stays-ocean.jpg";
+import staysSingaar from "@/assets/stays-singaar.jpg";
+import staysJaba from "@/assets/stays-jaba.jpg";
+import staysJeyam from "@/assets/stays-jeyam.jpg";
+import staysGreenpark from "@/assets/stays-greenpark.jpg";
+import staysRamraj from "@/assets/stays-ramraj.jpg";
+import staysSamudra from "@/assets/stays-samudra.jpg";
+import staysTamilNadu from "@/assets/stays-tamilnadu.jpg";
+import staysViswa from "@/assets/stays-viswa.jpg";
+import staysUdipi from "@/assets/stays-udipi.jpg";
+import staysNewcape from "@/assets/stays-newcape.jpg";
+import staysSunpark from "@/assets/stays-sunpark.jpg";
+import staysWins from "@/assets/stays-wins.jpg";
+import staysGopiNivasGrand from "@/assets/stays-gopinivasgrand.jpg"
 import staysSparsaResorts from "@/assets/stays-sparsaresorts.jpg";
 import staysTempleCiti from "@/assets/stays-templeciti.jpg";
 
@@ -104,7 +123,33 @@ export const stayImages: Record<string, string> = {
   "hotel-sea-view": staysSeaView,
   "hotel-temple-citi": staysTempleCiti,
   "hotel-sangam": staysSangam,
-  "sea-breeze-homestay": stayPlaceholder,
+  // The project currently includes five local stay photographs. The remaining
+  // identifiers deliberately use the local fallback until licensed images are added.
+  "hotel-sea-face": staysSeaFace,
+  "hotel-sea-land": staysSeaLand,
+  "hotel-singaar-international": staysSingaar,
+  "hotel-jebasakthy": staysJaba,
+  "hotel-samudra": staysSamudra,
+  "hotel-sun-park": staysSunpark,
+  "new-cape-hotel": staysNewcape,
+  "ramraj-regency": staysRamraj,
+  "hotel-tri-sea": staysTriSea,
+  "ttdc-hotel-tamilnadu": staysTamilNadu,
+  "hotel-gopinivas-grand": staysGopiNivasGrand,
+  "hotel-wins": staysWins,
+  "hotel-anand": stayPlaceholder,
+  "hotel-raghavi-tourist-home": stayPlaceholder,
+  "manickam-tourist-home": stayPlaceholder,
+  "hotel-rani-residency": stayPlaceholder,
+  "hotel-coral-kanyakumari": staysCoral,
+  "hotel-jeyam": staysJeyam,
+  "hotel-viswa-grand": staysViswa,
+  "hotel-udupi-international": staysUdipi,
+  "hotel-cape-inn": stayPlaceholder,
+  "hotel-ocean-heritage": staysOceanHeritage,
+  "hotel-green-park": staysGreenpark,
+  "anantya-resorts": anantyaImage,
+  "aanantham-resort": stayPlaceholder,
 };
 
 export const foodImages: Record<string, string> = {
