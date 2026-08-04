@@ -1,6 +1,13 @@
 {
+  "buildCommand": "node scripts/build-api.mjs && node scripts/prepare-vercel-api.mjs && vite build",
   "functions": {
     "api/nearby.js": {
+      "maxDuration": 20
+    },
+    "api/itinerary.js": {
+      "maxDuration": 30
+    },
+    "api/chat.js": {
       "maxDuration": 20
     }
   },

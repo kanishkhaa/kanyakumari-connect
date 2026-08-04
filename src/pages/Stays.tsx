@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal, User, CreditCard, ChevronDown, ChevronUp, Info, MessageSquare, Star, X } from "lucide-react";
 import { stays as fallbackStays } from "@/data/stays";
 import type { Stay, StayType } from "@/data/stays";
-import { StayCard } from "@/components/stayCard";
+import { StayCard } from "@/components/StayCard";
 import { Button } from "@/components/ui/button";
 import { useCollection } from "@/hooks/useCollection";
 import { getReviews, getVendorStays, initMarketplaceFromSupabase, saveReview, subscribeToReviews } from "@/lib/localMarketplace";
@@ -92,13 +92,19 @@ export default function Stays() {
         <p className="hidden items-center gap-1 text-xs text-muted-foreground sm:flex"><SlidersHorizontal className="h-3.5 w-3.5" />Prices are planning estimates, not live rates.</p>
       </div>
 
-      {visibleStays.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-8 text-center"><h2 className="font-display text-2xl font-semibold">No stays match these filters</h2><p className="mt-2 text-muted-foreground">Try a broader search or clear one of the filters.</p></div>
-      ) : (
-        <div className="mt-6 grid gap-6 xl:grid-cols-2">
-          {visibleStays.map((stay) => <StayCard key={stay.id} stay={stay} reviewCount={getReviews(stay.id).length} onViewReviews={() => setReviewFor(stay.id)} onReview={() => setReviewFor(stay.id)} onEnquire={() => { setSelected(stay); setBooked(false); }} />)}
-        </div>
-      )}
+      {visibleStays.map((stay) => (
+  <StayCard
+    key={stay.id}
+    stay={stay}
+    reviewCount={getReviews(stay.id).length}
+    onReview={() => setReviewFor(stay.id)}
+    onViewReviews={() => setReviewFor(stay.id)}
+    onEnquire={() => {
+      setSelected(stay);
+      setBooked(false);
+    }}
+  />
+))}
 
       {selected && <BookingModal stay={selected} booked={booked} onClose={() => setSelected(null)} onSubmit={submitBooking} />}
       {reviewFor && <ReviewModal stay={allStays.find((stay) => stay.id === reviewFor)!} onClose={() => setReviewFor(null)} onSaved={() => setReviewFor(null)} />}

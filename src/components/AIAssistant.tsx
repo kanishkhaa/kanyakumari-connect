@@ -17,7 +17,7 @@ export default function AIAssistant() {
   useEffect(() => {
     const greetingText = lang === "ta"
       ? "வணக்கம்! 🌅 நான் உங்கள் கன்னியாகுமரி AI உதவியாளர். இடங்கள், உணவு, தங்குமிடங்கள் அல்லது பயண திட்டங்கள் பற்றி என்னிடம் கேளுங்கள்."
-      : "Vanakkam! 🌅 I'm your Gemini AI Kanyakumari assistant. Ask me about places, food, weather, or custom trip plans.";
+      : "Vanakkam! 🌅 I'm your  AI Kanyakumari assistant. Ask me about places, food, weather, or custom trip plans.";
     setMsgs([{ role: "bot", text: greetingText }]);
   }, [lang]);
 
@@ -70,7 +70,7 @@ export default function AIAssistant() {
                 <Sparkles className="h-5 w-5" />
                 <div>
                   <p className="font-semibold leading-tight">{t("ai_assistant_title")}</p>
-                  <p className="text-[11px] opacity-90">{lang === "ta" ? "Gemini AI மூலம் இயங்குகிறது" : "Powered by Gemini AI"}</p>
+                  <p className="text-[11px] opacity-90">{lang === "ta" ? "AI மூலம் இயங்குகிறது" : "Powered by AI"}</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="p-1 hover:bg-background/20 rounded">
@@ -106,7 +106,7 @@ export default function AIAssistant() {
                 <div className="flex justify-start">
                   <div className="flex items-center gap-2 rounded-2xl bg-muted px-4 py-2.5 text-xs text-muted-foreground">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    {lang === "ta" ? "Gemini AI சிந்திக்கிறது..." : "Gemini AI is thinking..."}
+                    {lang === "ta" ? "AI சிந்திக்கிறது..." : "AI is thinking..."}
                   </div>
                 </div>
               )}

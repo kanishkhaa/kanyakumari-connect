@@ -31,6 +31,7 @@ import placeStXavierChurch from "@/assets/place-stxavierchurch.jpg";
 import placeSuchindram from "@/assets/place-suchindram.jpg";
 import placeSunsetPoint from "@/assets/place-sunsetpoint.jpg";
 import placeThiruvalluvar from "@/assets/place-thiruvalluvar.jpg";
+import placeKalikesamFalls from "@/assets/place-kalikesamfalls.jpg";
 import placeTsunamiMemorialPark from "@/assets/place-tsunamimemorialpark.jpg";
 import placeUdayagiriFort from "@/assets/place-udayagirifort.jpg";
 import placeVattakottaiFort from "@/assets/place-vattakottaifort.jpg";
@@ -38,6 +39,26 @@ import placeVellimalaiMuruganTemple from "@/assets/place-vellimalaimurugantemple
 import placeViewTower from "@/assets/place-viewtower.jpg";
 import placeVivekanandhaRock from "@/assets/place-vivekanandharock.jpg";
 import placeWanderingMonkMuseum from "@/assets/place-wanderingmonkmuseum.jpg";
+import placeBharatMataTemple from "@/assets/place-bharatmatatemple.jpg";
+import placePechiparai from "@/assets/place-pechiparai.jpg";
+import placeKamarajarManiMandapam from "@/assets/place-kamarajarmanimandapam.jpg";
+import placeThirunanthikarai from "@/assets/place-thirunanthikarai.jpg";
+import placeMuttomBeach from "@/assets/place-muttombeach.jpg";
+import placeMarunthuvazh from "@/assets/place-marunthuvazh.jpg";
+import placeThengapattinam from "@/assets/place-thengapattinam.jpg";
+import placeWildlifeSanctuary from "@/assets/place-wildlifesanctuary.jpg";
+import placeChitharalJainMonument from "@/assets/place-chitharaljainmonument.jpg";
+import placeOurLadyOfRansom from "@/assets/place-ourladyofransom.jpg";
+import placeSripada from "@/assets/place-sripada.jpg";
+import placeGuganathaswamy from "@/assets/place-guganathaswamy.jpg";
+import placeMukkadalDam from "@/assets/place-mukkadaldam.jpg";
+import placePeerMohammedDargah from "@/assets/place-peermohammeddargah.jpg";
+import placeOlakaruviWaterFall from "@/assets/place-olakaruviwaterfall.jpg";
+import placeThiruchendur from "@/assets/place-thiruchendur.jpg";
+import placeMahaviSwami from "@/assets/place-mahavirswami.jpg";
+import placeChothavizhai from "@/assets/place-chothavizhai.jpg";
+import placeThiruparuppuFalls from "@/assets/place-thiruparuppufalls.jpg";
+import placeKeeriparai from "@/assets/place-keeriparai.jpg";
 import staysAnnaiResorts from "@/assets/stays-annairesorts.jpg";
 import anantyaImage from "@/assets/stays-anantya.jpg";
 import staysSeaFace from "@/assets/stays-seaface.jpg";
@@ -63,6 +84,7 @@ import staysGopiNivasGrand from "@/assets/stays-gopinivasgrand.jpg"
 import staysSparsaResorts from "@/assets/stays-sparsaresorts.jpg";
 import staysTempleCiti from "@/assets/stays-templeciti.jpg";
 
+
 // Single image registry.
 // Add your local files under src/assets, import them here, then replace the placeholder value.
 // Suggested filenames: use the matching id, for example src/assets/vivekananda-rock-memorial.jpg.
@@ -83,7 +105,7 @@ export const placeImages: Record<string, string> = {
   "wandering-monk-museum": placeWanderingMonkMuseum,
   "padmanabhapuram-palace": placePadmanabhapuramPalace,
   "vattakottai-fort": placeVattakottaiFort,
-  "bharat-mata-temple": placePlaceholder,
+  "bharat-mata-temple": placeBharatMataTemple,
   "sunset-point": placeSunsetPoint,
   "view-tower": placeViewTower,
   "mayapuri-wonder-wax": placeMayapuriWonderWax,
@@ -95,26 +117,26 @@ export const placeImages: Record<string, string> = {
   "nagaraja-temple": placeNagarajaTemple,
   "st-xavier-church": placeStXavierChurch,
   "sanguthurai-beach": placeSanguthuraiBeach,
-  "kalikesam-waterfall": placePlaceholder,
-  "pechiparai-dam": placePlaceholder,
-  "muttom-beach": placePlaceholder,
-  "marunthuvazh-malai": placePlaceholder,
-  "thengapattinam-beach": placePlaceholder,
-  "kanyakumari-wildlife-sanctuary": placePlaceholder,
-  "chitharal-jain-monuments": placePlaceholder,
-  "our-lady-of-ransom-church": placePlaceholder,
-  "sripada-parai": placePlaceholder,
-  "guganathaswamy-temple": placePlaceholder,
-  "kamarajar-mani-mandapam": placePlaceholder,
-  "mukkadal-dam": placePlaceholder,
-  "peer-mohammed-dargah": placePlaceholder,
-  "olakaruvi-waterfalls": placePlaceholder,
-  "thirunanthikarai-cave-temple": placePlaceholder,
-  "thiruchendur-murugan-temple": placePlaceholder,
-  "mahavirswami-jain-temple-dadawadi": placePlaceholder,
-  "sothavilai-beach": placePlaceholder,
-  "thirparappu-falls": placePlaceholder,
-  "keeriparai-reserve-forest": placePlaceholder,
+  "kalikesam-waterfall": placeKalikesamFalls,
+  "pechiparai-dam": placePechiparai,
+  "muttom-beach": placeMuttomBeach,
+  "marunthuvazh-malai": placeMarunthuvazh,
+  "thengapattinam-beach": placeThengapattinam,
+  "kanyakumari-wildlife-sanctuary": placeWildlifeSanctuary,
+  "chitharal-jain-monuments": placeChitharalJainMonument,
+  "our-lady-of-ransom-church": placeOurLadyOfRansom,
+  "sripada-parai": placeSripada,
+  "guganathaswamy-temple": placeGuganathaswamy,
+  "kamarajar-mani-mandapam": placeKamarajarManiMandapam,
+  "mukkadal-dam": placeMukkadalDam,
+  "peer-mohammed-dargah": placePeerMohammedDargah,
+  "olakaruvi-waterfalls": placeOlakaruviWaterFall,
+  "thirunanthikarai-cave-temple": placeThirunanthikarai,
+  "thiruchendur-murugan-temple": placeThiruchendur,
+  "mahavirswami-jain-temple-dadawadi": placeMahaviSwami,
+  "sothavilai-beach": placeChothavizhai,
+  "thirparappu-falls": placeThiruparuppuFalls,
+  "keeriparai-reserve-forest": placeKeeriparai,
 };
 
 export const stayImages: Record<string, string> = {
@@ -171,6 +193,10 @@ export const eventImages: Record<string, string> = {
   "christmas-coastal-celebrations": eventChristmas,
 };
 
-export function imageFor(registry: Record<string, string>, id: string, fallback: string) {
+export function imageFor(
+  registry: Record<string, string>,
+  id: string,
+  fallback: string
+) {
   return registry[id] ?? fallback;
 }

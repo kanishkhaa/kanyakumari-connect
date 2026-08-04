@@ -240,7 +240,7 @@ export default function Itinerary() {
                   {loadingAi ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      {lang === "ta" ? "Gemini AI உருவாக்குகிறது..." : "Generating with Gemini AI..."}
+                      {lang === "ta" ? "AI உருவாக்குகிறது..." : "Generating with AI..."}
                     </>
                   ) : (
                     <>
@@ -270,7 +270,7 @@ export default function Itinerary() {
                 {!generated ? (
                   <div className="min-h-[360px] border-2 border-dashed border-border bg-card p-10 text-center rounded-2xl flex flex-col items-center justify-center">
                     <Sparkles className="h-12 w-12 text-primary mb-3 animate-pulse" />
-                    <h2 className="font-display text-2xl font-bold">{lang === "ta" ? "உங்கள் நாள்வாரியான AI திட்டம் இங்கே தோன்றும்" : "Your Gemini AI Custom Trip Plan Appears Here"}</h2>
+                    <h2 className="font-display text-2xl font-bold">{lang === "ta" ? "உங்கள் நாள்வாரியான AI திட்டம் இங்கே தோன்றும்" : "Your AI Custom Trip Plan Appears Here"}</h2>
                     <p className="mt-2 max-w-md text-muted-foreground">{lang === "ta" ? "நாட்கள், பட்ஜெட் மற்றும் விருப்பங்களை தேர்வுசெய்து AI பயண திட்டத்தை உருவாக்குங்கள்." : "Select your preferences and click 'Generate Custom Trip with AI'."}</p>
                   </div>
                 ) : (
