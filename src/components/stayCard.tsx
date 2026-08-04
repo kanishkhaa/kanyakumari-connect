@@ -6,10 +6,11 @@ type StayCardProps = {
   stay: Stay;
   reviewCount?: number;
   onReview: () => void;
+  onViewReviews: () => void;
   onEnquire: () => void;
 };
 
-export function StayCard({ stay, reviewCount = 0, onReview, onEnquire }: StayCardProps) {
+export function StayCard({ stay, reviewCount = 0, onReview, onViewReviews, onEnquire }: StayCardProps) {
   const totalReviews = stay.reviews + reviewCount;
 
   return (
@@ -46,7 +47,8 @@ export function StayCard({ stay, reviewCount = 0, onReview, onEnquire }: StayCar
               <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground"><Star className="h-3.5 w-3.5 fill-accent text-accent" />{stay.rating.toFixed(1)} · {totalReviews} reviews</p>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={onReview}>Review</Button>
+              <Button variant="outline" size="sm" onClick={onViewReviews}>View reviews</Button>
+              <Button variant="outline" size="sm" onClick={onReview}>Write a review</Button>
               <Button variant="hero" size="sm" onClick={onEnquire}>Enquire</Button>
             </div>
           </div>

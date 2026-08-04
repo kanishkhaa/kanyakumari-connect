@@ -33,11 +33,29 @@ let cachedStays: Stay[] = [];
 let cachedOperators: Operator[] = [];
 let cachedReviews: Review[] = [];
 let cachedApplications: HostApplication[] = [];
+const reviewListeners = new Set<() => void>();
+
+type StoredReview = {
+  listing_id: string;
+  guest_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+};
+
+const notifyReviewListeners = () => reviewListeners.forEach((listener) => listener());
 
 export async function initMarketplaceFromSupabase() {
   cachedStays = await fetchCollection<Stay[]>("stays", []);
   cachedOperators = await fetchCollection<Operator[]>("operators", []);
-  cachedReviews = await fetchCollection<Review[]>("reviews", []);
+  const storedReviews = await fetchTableRows<StoredReview>("reviews", {
+    select: "listing_id,guest_name,rating,comment,created_at",
+    order: "created_at.desc",
+  });
+  cachedReviews = storedReviews.length
+    ? storedReviews.map((review) => ({ listingId: review.listing_id, name: review.guest_name, rating: review.rating, comment: review.comment, createdAt: review.created_at }))
+    : await fetchCollection<Review[]>("reviews", []);
+  notifyReviewListeners();
 
   // Fetch host applications from vendor_applications table or fallback collection
   const dbApps = await fetchTableRows<{ id: string; listing_type: string; status: string; payload: HostApplication }>("vendor_applications");
@@ -75,8 +93,16 @@ export function getReviews(listingId: string): Review[] {
   return cachedReviews.filter((review) => review.listingId === listingId);
 }
 
+export function subscribeToReviews(listener: () => void) {
+  reviewListeners.add(listener);
+  return () => {
+    reviewListeners.delete(listener);
+  };
+}
+
 export async function saveReview(review: Review) {
   cachedReviews = [review, ...cachedReviews];
+  notifyReviewListeners();
   await saveCollection("reviews", cachedReviews);
   await insertRow("reviews", {
     listing_type: "general",
