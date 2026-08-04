@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Star, Clock, MapPin, Ticket, Sun, Bus, Lightbulb, ExternalLink } from "lucide-react";
+import { ArrowLeft, Star, Clock, MapPin, Ticket, Sun, Lightbulb, ExternalLink } from "lucide-react";
 import { places as fallbackPlaces } from "@/data/places";
 import { useCollection } from "@/hooks/useCollection";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,9 @@ export default function PlaceDetail() {
     { icon: Sun, label: "Best time", value: place.bestTime },
     { icon: MapPin, label: "Location", value: place.distance },
   ];
-  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.mapQuery ?? `${place.name}, Kanyakumari, Tamil Nadu`)}`;
+  const mapQuery = place.mapQuery ?? `${place.name}, Kanyakumari, Tamil Nadu`;
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
 
   return (
     <article>
@@ -47,7 +49,29 @@ export default function PlaceDetail() {
         <div className="lg:col-span-2 space-y-10">
           <section>
             <h2 className="font-display text-2xl font-semibold mb-3">About</h2>
-            <p className="text-muted-foreground leading-relaxed text-[17px]">{place.description}</p>
+            <p className="text-justify text-muted-foreground leading-relaxed text-[17px]">{place.description}</p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-2xl font-semibold mb-4">Location map</h2>
+            <div className="overflow-hidden rounded-2xl border border-border bg-muted shadow-soft">
+              <iframe
+                title={`Location map for ${place.name}`}
+                src={mapEmbedUrl}
+                className="h-[360px] w-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+            <a
+              href={mapUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+            >
+              Open {place.name} in Google Maps <ExternalLink className="h-3.5 w-3.5" />
+            </a>
           </section>
 
           <section>
@@ -62,20 +86,7 @@ export default function PlaceDetail() {
             </ul>
           </section>
 
-          <section className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 rounded-2xl border border-border">
-              <div className="flex items-center gap-2 mb-3 text-secondary"><Bus className="h-5 w-5" /><h3 className="font-semibold">How to reach</h3></div>
-              <p className="text-sm text-muted-foreground">{place.howToReach}</p>
-              <p className="text-sm mt-3"><span className="font-medium">Nearby bus:</span> {place.nearbyBus}</p>
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-              >
-                <MapPin className="h-4 w-4" /> View on Google Maps <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            </div>
+          <section>
             <div className="p-6 rounded-2xl border border-border">
               <div className="flex items-center gap-2 mb-3 text-primary"><Lightbulb className="h-5 w-5" /><h3 className="font-semibold">Local tips</h3></div>
               <ul className="space-y-2 text-sm text-muted-foreground">

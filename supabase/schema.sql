@@ -27,6 +27,8 @@ create table if not exists public.bookings (
   created_at timestamptz not null default now()
 );
 
+alter table public.bookings add column if not exists booking_details jsonb;
+
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
   listing_type text not null,
