@@ -35,16 +35,31 @@ export default function Stays() {
     return Array.from(new Map(merged.map((stay) => [stay.id, stay])).values());
   }, [databaseStays]);
 
+  // derived categories from data
+  const categories = useMemo(() => {
+    const types = Array.from(new Set(allStays.map((s) => s.type))).sort();
+    return ["All", ...types];
+  }, [allStays]);
+
   const visibleStays = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = query.replace(/\s+/g, " ").trim().toLowerCase();
     const filtered = allStays.filter((stay) => {
-      const matchesQuery = !normalizedQuery || [stay.name, stay.location, stay.type, stay.description, ...stay.amenities]
-        .join(" ").toLowerCase().includes(normalizedQuery);
-      return matchesQuery && (type === "All" || stay.type === type)
-        && stay.rating >= Number(minimumRating)
-        && (!Number(maximumPrice) || stay.pricePerNight <= Number(maximumPrice));
+      const fields: string[] = [
+        stay.name,
+        stay.type,
+        stay.location,
+        stay.description,
+        ...(stay.amenities || []),
+         
+      ].filter(Boolean) as string[];
+      const haystack = fields.join(" ").toLowerCase();
+      const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
+      const matchesType = type === "All" || stay.type === type;
+      const matchesRating = stay.rating >= Number(minimumRating);
+      const matchesPrice = !Number(maximumPrice) || stay.pricePerNight <= Number(maximumPrice);
+      return matchesQuery && matchesType && matchesRating && matchesPrice;
     });
-    return filtered.sort((a, b) => {
+    const sorted = filtered.sort((a, b) => {
       if (sort === "price-low") return a.pricePerNight - b.pricePerNight;
       if (sort === "price-high") return b.pricePerNight - a.pricePerNight;
       if (sort === "rating") return b.rating - a.rating;
@@ -52,6 +67,7 @@ export default function Stays() {
       if (sort === "name") return a.name.localeCompare(b.name);
       return Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || b.rating - a.rating;
     });
+    return sorted;
   }, [allStays, query, type, minimumRating, maximumPrice, sort]);
 
   const submitBooking = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -75,14 +91,14 @@ export default function Stays() {
       </header>
 
       <section aria-label="Stay filters" className="mt-8 rounded-2xl border border-border bg-card p-4 shadow-soft">
-        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_repeat(4,minmax(130px,auto))]">
+        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_repeat(4,minmax(140px,auto))]">
           <label className="flex items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search hotels, locations or amenities" className="min-w-0 flex-1 bg-transparent outline-none" />
           </label>
-          <FilterSelect label="Type" value={type} onChange={(value) => setType(value as StayType | "All")} options={stayTypes.map((item) => [item, item])} />
-          <FilterSelect label="Minimum rating" value={minimumRating} onChange={setMinimumRating} options={[["0", "Any rating"], ["4", "4.0+"], ["4.2", "4.2+"], ["4.5", "4.5+"]]} />
-          <FilterSelect label="Max price" value={maximumPrice} onChange={setMaximumPrice} options={[["0", "Any price"], ["2500", "Up to ₹2,500"], ["4000", "Up to ₹4,000"], ["6000", "Up to ₹6,000"]]} />
+          <FilterSelect label="Category" value={type} onChange={(value) => setType(value as StayType | "All")} options={categories.map((item) => [item, item])} />
+          <FilterSelect label="Minimum rating" value={minimumRating} onChange={setMinimumRating} options={[["0", "Any rating"], ["3.5", "3.5+"], ["4", "4.0+"], ["4.5", "4.5+"]]} />
+          <FilterSelect label="Max price" value={maximumPrice} onChange={setMaximumPrice} options={[["0", "Any price"], ["2000", "Up to ₹2,000"], ["4000", "Up to ₹4,000"], ["7000", "Up to ₹7,000"]]} />
           <FilterSelect label="Sort" value={sort} onChange={(value) => setSort(value as SortOption)} options={[["recommended", "Recommended"], ["rating", "Highest rated"], ["price-low", "Lowest price"], ["price-high", "Highest price"], ["reviews", "Most reviewed"], ["name", "Name A–Z"]]} />
         </div>
       </section>
@@ -92,19 +108,24 @@ export default function Stays() {
         <p className="hidden items-center gap-1 text-xs text-muted-foreground sm:flex"><SlidersHorizontal className="h-3.5 w-3.5" />Prices are planning estimates, not live rates.</p>
       </div>
 
-      {visibleStays.map((stay) => (
-  <StayCard
-    key={stay.id}
-    stay={stay}
-    reviewCount={getReviews(stay.id).length}
-    onReview={() => setReviewFor(stay.id)}
-    onViewReviews={() => setReviewFor(stay.id)}
-    onEnquire={() => {
-      setSelected(stay);
-      setBooked(false);
-    }}
-  />
-))}
+      <div className="mt-6 space-y-6">
+        {visibleStays.length ? visibleStays.map((stay) => (
+          <StayCard
+            key={stay.id}
+            stay={stay}
+            reviewCount={getReviews(stay.id).length}
+            onReview={() => setReviewFor(stay.id)}
+            onEnquire={() => {
+              setSelected(stay);
+              setBooked(false);
+            }}
+          />
+        )) : <div className="rounded-2xl border border-border bg-card p-8 text-center">
+          <h3 className="font-display text-xl font-semibold">No hotels found</h3>
+          <p className="mt-2 text-sm text-muted-foreground">We couldn't find hotels matching your filters. Try adjusting search terms or filters.</p>
+          <div className="mt-4 flex justify-center"><Button variant="outline" onClick={() => { setQuery(""); setType("All"); setMinimumRating("0"); setMaximumPrice("0"); setSort("recommended"); }}>Reset filters</Button></div>
+        </div>}
+      </div>
 
       {selected && <BookingModal stay={selected} booked={booked} onClose={() => setSelected(null)} onSubmit={submitBooking} />}
       {reviewFor && <ReviewModal stay={allStays.find((stay) => stay.id === reviewFor)!} onClose={() => setReviewFor(null)} onSaved={() => setReviewFor(null)} />}

@@ -1,6 +1,9 @@
 import type { Stay } from "@/data/stays";
 import type { Operator } from "@/data/operators";
 import { fetchCollection, saveCollection, insertRow, fetchTableRows } from "./supabaseContent";
+import type { Review as ReviewType } from "@/types/review";
+import sampleReviews from "@/data/sampleReviews";
+ 
 
 export type Review = {
   listingId: string;
@@ -59,9 +62,13 @@ export async function initMarketplaceFromSupabase() {
     select: "listing_id,guest_name,rating,comment,created_at",
     order: "created_at.desc",
   });
-  cachedReviews = storedReviews.length
-    ? storedReviews.map((review) => ({ listingId: review.listing_id, name: review.guest_name, rating: review.rating, comment: review.comment, createdAt: review.created_at }))
-    : await fetchCollection<Review[]>("reviews", []);
+  if (storedReviews && storedReviews.length) {
+    cachedReviews = storedReviews.map((review) => ({ listingId: review.listing_id, name: review.guest_name, rating: review.rating, comment: review.comment, createdAt: review.created_at }));
+  } else {
+    // Fall back to remote collection, or seeded sample reviews when empty
+    const fetched = await fetchCollection<Review[]>("reviews", []);
+    cachedReviews = fetched.length ? fetched : sampleReviews;
+  }
   notifyReviewListeners();
 
   // Fetch host applications from vendor_applications table or fallback collection
