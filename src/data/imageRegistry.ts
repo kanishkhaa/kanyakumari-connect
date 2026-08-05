@@ -191,6 +191,16 @@ export const eventImages: Record<string, string> = {
   "navaratri-kumari-amman": eventNavaratri,
   "cape-festival": eventCapeFestival,
   "christmas-coastal-celebrations": eventChristmas,
+  "pongal-festival": eventPongal,
+  "kumari-thiruvizha": eventVaisakhiFestival,
+  "vavubali-exhibition": eventCapeFestival,
+  "bagavathiamman-festival": eventAadiAmman,
+  "vaikasi-visagam": eventVaisakhiFestival,
+  "thirukarthigai": eventKalabhamSandal,
+  "aadi-ammavasai": eventAadiAmman,
+  "thai-ammavasai": eventFullMoon,
+  "mandaikadu-kodai": eventNavaratri,
+  "francis-xavier-cathedral-festival": eventChristmas,
 };
 
 export function imageFor(

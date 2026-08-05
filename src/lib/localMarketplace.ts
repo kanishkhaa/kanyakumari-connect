@@ -35,6 +35,13 @@ let cachedReviews: Review[] = [];
 let cachedApplications: HostApplication[] = [];
 const reviewListeners = new Set<() => void>();
 
+const demoHostApplications: HostApplication[] = [
+  { id: "demo-host-1", owner: "Meena Raj", business: "Cape View Homestay", listingType: "Homestay", town: "Kanyakumari", phone: "+91 98765 11001", email: "meena@capeview.example", description: "Family-run sea-view rooms close to the sunrise point.", status: "approved", submittedAt: "02 Aug 2026", documents: { idProof: true, ownership: true, license: true } },
+  { id: "demo-host-2", owner: "Arun Kumar", business: "Western Ghats Trail Co.", listingType: "Tour operator", town: "Nagercoil", phone: "+91 98765 11002", email: "arun@ghatstrails.example", description: "Small-group day trips to waterfalls, dams and village trails.", status: "needs_review", submittedAt: "01 Aug 2026", documents: { idProof: true, ownership: true, license: false } },
+  { id: "demo-host-3", owner: "Fathima Noor", business: "Sea Shell Crafts", listingType: "Local shop", town: "Kanyakumari", phone: "+91 98765 11003", email: "fathima@seashell.example", description: "Handmade shell art and locally sourced souvenir gifts.", status: "approved", submittedAt: "30 Jul 2026", documents: { idProof: true, ownership: true, license: true } },
+  { id: "demo-host-4", owner: "Suresh Babu", business: "Thirparappu River Café", listingType: "Restaurant", town: "Thirparappu", phone: "+91 98765 11004", email: "suresh@rivercafe.example", description: "Traditional lunch and refreshments for waterfall visitors.", status: "needs_review", submittedAt: "28 Jul 2026", documents: { idProof: true, ownership: false, license: true } },
+];
+
 type StoredReview = {
   listing_id: string;
   guest_name: string;
@@ -63,6 +70,7 @@ export async function initMarketplaceFromSupabase() {
     cachedApplications = dbApps.map((row) => row.payload || (row as unknown as HostApplication));
   } else {
     cachedApplications = await fetchCollection<HostApplication[]>("host_applications", []);
+    if (cachedApplications.length === 0) cachedApplications = demoHostApplications;
   }
 }
 
@@ -114,7 +122,7 @@ export async function saveReview(review: Review) {
 }
 
 export function getHostApplications(): HostApplication[] {
-  return cachedApplications;
+  return cachedApplications.length ? cachedApplications : demoHostApplications;
 }
 
 export async function saveHostApplication(application: HostApplication) {

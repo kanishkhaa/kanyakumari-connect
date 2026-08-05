@@ -18,7 +18,7 @@ export default function Events() {
       <header className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">Events</p>
         <h1 className="mt-2 font-display text-5xl font-bold">{t("events_title")}</h1>
-        <p className="mt-4 text-muted-foreground text-lg">{t("events_intro")}</p>
+        <p className="mt-4 text-muted-foreground text-lg">Explore festivals, cultural celebrations and temple events across Kanniyakumari district.</p>
       </header>
 
       <div className="mt-8 flex flex-wrap gap-2">
@@ -42,7 +42,7 @@ export default function Events() {
               <h3 className="mt-1 font-display text-xl font-semibold">{e.title}</h3>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1.5"><MapPin className="h-3 w-3" /> {e.location}</p>
               <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{e.description}</p>
-              <a href="#" className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"><Calendar className="h-4 w-4" /> Add to calendar</a>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary"><Calendar className="h-4 w-4" /> {e.date}</span>
             </div>
           </article>
         ))}

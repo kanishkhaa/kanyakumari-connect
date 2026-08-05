@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { dishes, emergencyContacts, restaurants } from "@/data/food";
-import { events } from "@/data/events";
 import type { Restaurant } from "@/data/food";
-import { Calendar, MapPin, Phone, Navigation, UtensilsCrossed, Star } from "lucide-react";
+import { Phone, Navigation, UtensilsCrossed, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
@@ -127,31 +126,6 @@ export default function FoodEvents() {
                     {r.phone && <a className="rounded-full bg-primary/10 px-3 py-1.5 text-sm text-primary" href={`tel:${r.phone.replace(/[^0-9]/g, "")}`}>Call</a>}
                     <a className="rounded-full bg-muted px-3 py-1.5 text-sm" target="_blank" rel="noreferrer" href={`https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lon}#map=17/${r.lat}/${r.lon}`}>Map</a>
                   </div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <header className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">Festivals & events</p>
-          <h2 className="mt-2 font-display text-4xl font-bold">Plan around the calendar</h2>
-        </header>
-        <div className="mt-8 grid md:grid-cols-2 gap-5">
-          {events.map((e) => (
-            <article key={e.id} className="overflow-hidden rounded-2xl border border-border bg-card hover:border-primary/40 transition-smooth group">
-              <div className="grid sm:grid-cols-[180px_1fr]">
-                  <img src={e.image} alt={e.title} loading="lazy" className="h-full min-h-[180px] w-full object-cover transition-smooth duration-700 group-hover:scale-105" />
-                <div className="p-6">
-                  <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl gradient-sunset">
-                    <Calendar className="h-5 w-5 text-primary-foreground" />
-                  </span>
-                  <h3 className="font-display text-xl font-semibold">{e.title}</h3>
-                  <p className="text-xs text-primary font-medium mt-0.5">{e.month} - {e.date}</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {e.location}</p>
-                  <p className="text-sm text-muted-foreground mt-3">{e.description}</p>
                 </div>
               </div>
             </article>

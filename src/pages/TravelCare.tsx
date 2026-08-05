@@ -31,6 +31,13 @@ type TravelCareQuery = {
   replies: TravelCareReply[];
 };
 
+const demoQueries: TravelCareQuery[] = [
+  { id: "demo-query-1", subject: "Ferry timing for Vivekananda Rock", author: "Priya Nair", email: "priya@example.com", phone: "+91 98765 21001", message: "Could you share the first ferry timing for this Saturday?", category: "Transport", priority: "Normal", date: "03/08/2026 10:15 am", replies: [{ id: "reply-1", date: "03/08/2026 11:00 am", message: "Ferry services usually begin in the morning; please confirm at the jetty on the day because weather can affect timings." }] },
+  { id: "demo-query-2", subject: "Need help finding a clinic", author: "Ravi Menon", email: "ravi@example.com", phone: "+91 98765 21002", message: "My father feels unwell near Kanyakumari beach and we need a nearby clinic.", category: "Emergency", priority: "High", date: "02/08/2026 05:40 pm", replies: [] },
+  { id: "demo-query-3", subject: "Family stay near the beach", author: "Anitha S", email: "anitha@example.com", phone: "+91 98765 21003", message: "Looking for a clean two-night stay for four people near the beach.", category: "Stay", priority: "Normal", date: "01/08/2026 09:20 am", replies: [{ id: "reply-3", date: "01/08/2026 10:05 am", message: "You can browse verified stays in our Stay section and filter by location and amenities." }] },
+  { id: "demo-query-4", subject: "Best stop between Kanyakumari and Thirparappu", author: "Kavin R", email: "kavin@example.com", phone: "+91 98765 21004", message: "Which tourist place is worth visiting while driving to Thirparappu Falls?", category: "Places", priority: "Normal", date: "31/07/2026 02:10 pm", replies: [] },
+];
+
 import { fetchCollection, saveCollection, insertRow, fetchTableRows } from "@/lib/supabaseContent";
 
 const formatDate = () =>
@@ -93,7 +100,8 @@ export default function TravelCare() {
       // Fetch queries from DB
       const dbQueries = await fetchTableRows<TravelCareQuery>("travelcare_queries");
       const fetchedQueries = dbQueries.length > 0 ? dbQueries : await fetchCollection<TravelCareQuery[]>("travelcare_queries", []);
-      setQueries(fetchedQueries.filter((q) => q.category && q.priority && Array.isArray(q.replies)));
+      const validQueries = fetchedQueries.filter((q) => q.category && q.priority && Array.isArray(q.replies));
+      setQueries(validQueries.length ? validQueries : demoQueries);
 
       // Check current session from Supabase app_content user session
       const savedUser = await fetchCollection<TravelCareUser | null>("current_user_session", null);

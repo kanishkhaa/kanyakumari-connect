@@ -1,8 +1,10 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Star, Clock, MapPin, Ticket, Sun, Lightbulb, ExternalLink } from "lucide-react";
+import { ArrowLeft, Star, Clock, MapPin, Ticket, Sun, Lightbulb, ExternalLink, Bus } from "lucide-react";
 import { places as fallbackPlaces } from "@/data/places";
 import { useCollection } from "@/hooks/useCollection";
 import { Button } from "@/components/ui/button";
+
+const VIRTUAL_TOUR_URL = "https://pixtronicsite.s3.ap-south-1.amazonaws.com/Kanchipuram%20E/English%20NEW%20EXE%2013%2011%202025/Kanyakumari%20E/Web/index.htm";
 
 export default function PlaceDetail() {
   const { id } = useParams();
@@ -27,6 +29,9 @@ export default function PlaceDetail() {
   const mapQuery = place.mapQuery ?? `${place.name}, Kanyakumari, Tamil Nadu`;
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
   const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
+  const virtualTourUrl = place.virtualTourScene
+    ? `${VIRTUAL_TOUR_URL}#media=${encodeURIComponent(place.virtualTourScene)}`
+    : undefined;
 
   return (
     <article>
@@ -52,6 +57,35 @@ export default function PlaceDetail() {
             <p className="text-justify text-muted-foreground leading-relaxed text-[17px]">{place.description}</p>
           </section>
 
+          {virtualTourUrl && (
+            <section>
+              <div className="flex items-end justify-between gap-4 mb-4">
+                <div>
+                  <h2 className="font-display text-2xl font-semibold">360° virtual tour</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Explore {place.name} without leaving this page.</p>
+                </div>
+                <a
+                  href={virtualTourUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                >
+                  Open full screen <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-border bg-muted shadow-soft">
+                <iframe
+                  title={`360 degree virtual tour of ${place.name}`}
+                  src={virtualTourUrl}
+                  className="h-[480px] w-full border-0"
+                  loading="lazy"
+                  allow="fullscreen; gyroscope; accelerometer"
+                  allowFullScreen
+                />
+              </div>
+            </section>
+          )}
+
           <section>
             <h2 className="font-display text-2xl font-semibold mb-4">Location map</h2>
             <div className="overflow-hidden rounded-2xl border border-border bg-muted shadow-soft">
@@ -73,6 +107,36 @@ export default function PlaceDetail() {
               Open {place.name} in Google Maps <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </section>
+
+          {place.busDetails?.length ? (
+            <section>
+              <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="font-display text-2xl font-semibold flex items-center gap-2"><Bus className="h-6 w-6 text-primary" /> Bus details</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Official routes serving this destination.</p>
+                </div>
+                <a href="https://kanniyakumari.nic.in/ts/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                  Source: Kanniyakumari District <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+              <div className="overflow-x-auto rounded-2xl border border-border">
+                <table className="w-full min-w-[620px] text-left text-sm">
+                  <thead className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                    <tr><th className="px-4 py-3 font-semibold">Bus terminal</th><th className="px-4 py-3 font-semibold">Route no.</th><th className="px-4 py-3 font-semibold">Via</th></tr>
+                  </thead>
+                  <tbody>
+                    {place.busDetails.map((bus) => (
+                      <tr key={`${bus.terminal}-${bus.routes}`} className="border-t border-border">
+                        <td className="px-4 py-3 font-medium">{bus.terminal}</td>
+                        <td className="px-4 py-3 text-primary">{bus.routes}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{bus.via}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ) : null}
 
           <section>
             <h2 className="font-display text-2xl font-semibold mb-4">Highlights</h2>
@@ -115,6 +179,13 @@ export default function PlaceDetail() {
             <Button asChild variant="hero" className="w-full mt-6">
               <Link to="/itinerary">Add to itinerary</Link>
             </Button>
+            {place.ferryBookingUrl && (
+              <Button asChild className="w-full mt-3" variant="outline">
+                <a href={place.ferryBookingUrl} target="_blank" rel="noreferrer">
+                  Book ferry ride <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
           </div>
         </aside>
       </div>

@@ -5,7 +5,7 @@ export const en = {
   nav_plan: "Plan your trip",
   nav_stays: "Stays",
   nav_shop: "Shop local",
-  nav_food: "Food & Events",
+  nav_food: "Food",
   nav_districts: "Regions",
   nav_gallery: "Gallery",
   nav_more: "More",

@@ -4,6 +4,12 @@ import palaceImg from "@/assets/place-palace.jpg";
 import waterfallImg from "@/assets/place-waterfall.jpg";
 import { imageFor, placeImages } from "@/data/imageRegistry";
 
+export type BusDetail = {
+  terminal: string;
+  routes: string;
+  via: string;
+};
+
 export type Place = {
   id: string;
   name: string;
@@ -22,6 +28,9 @@ export type Place = {
   nearbyBus: string;
   tips: string[];
   mapQuery?: string;
+  virtualTourScene?: string;
+  ferryBookingUrl?: string;
+  busDetails?: BusDetail[];
 };
 
 const categoryImage: Record<Place["category"], string> = {
@@ -65,6 +74,90 @@ const categoryDefaults: Record<Place["category"], Pick<Place, "ticket" | "timing
   },
 };
 
+const officialBusDetails: Record<string, BusDetail[]> = {
+  "sunrise-sunset-viewing": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 304", via: "Anna Bus Stand, Kottar, Suchindram, Kottaram" },
+    { terminal: "Nagercoil Anna", routes: "1, 2, 303", via: "Suchindram, Kottaram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "vivekananda-rock-memorial": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 303", via: "Anna Bus Stand, Kottar, Suchindram, Kottaram" },
+    { terminal: "Nagercoil Anna", routes: "1, 2, 303", via: "Suchindram, Kottaram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "thiruvalluvar-statue": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 304", via: "Anna Bus Stand, Kottar, Suchindram, Kottaram" },
+    { terminal: "Nagercoil Anna", routes: "1, 2, 303", via: "Suchindram, Kottaram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "glass-bridge-kanyakumari": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 303", via: "Anna Bus Stand, Kottar, Suchindram, Kottaram" },
+    { terminal: "Nagercoil Anna", routes: "1, 2, 303", via: "Suchindram, Kottaram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "devi-kanyakumari-temple": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 303", via: "Anna Bus Stand, Kottar, Suchindram, Kottaram" },
+    { terminal: "Nagercoil Anna", routes: "1, 2, 303", via: "Suchindram, Kottaram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "gandhi-mandapam": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 305", via: "Anna Bus Stand, Kottar, Suchindram, Kottaram" },
+    { terminal: "Nagercoil Anna", routes: "1, 2, 304", via: "Suchindram, Kottaram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "kamarajar-mani-mandapam": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 303", via: "Anna Bus Stand, Kottar, Suchindram, Kottaram" },
+    { terminal: "Nagercoil Anna", routes: "1, 2, 303", via: "Suchindram, Kottaram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "vattakottai-fort": [
+    { terminal: "Nagercoil Vadassery", routes: "1A, 1C, 1E, 2C", via: "Anna Bus Stand, Suchindram" },
+    { terminal: "Nagercoil Anna", routes: "1A, 1C, 1E, 2C", via: "Kottar, Suchindram" },
+    { terminal: "Kanniyakumari", routes: "1A, 1H, 2K, 21, 22, 501, 566, 566A", via: "Vivekanandapuram, Mathavapuram" },
+  ],
+  "thanumalayan-suchindram-temple": [
+    { terminal: "Nagercoil Vadassery / Anna", routes: "1, 2, 3, 303", via: "Kottar, Suchindram" },
+    { terminal: "Kanniyakumari", routes: "1, 2, 303, 349, 350", via: "Kottaram, Suchindram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "303", via: "Thuckalay, Nagercoil" },
+  ],
+  "nagaraja-temple": [
+    { terminal: "Nagercoil Vadassery", routes: "1, 2, 3, 31A", via: "Stadium" },
+    { terminal: "Kanniyakumari", routes: "1, 2, 303", via: "Kottaram, Suchindram" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "311, 303, 382, 451", via: "Thuckalay, Parvathipuram, Nagercoil" },
+  ],
+  "thirparappu-falls": [
+    { terminal: "Nagercoil Vadassery", routes: "313A, 341, 350", via: "Thuckalay, Thiruvattar" },
+    { terminal: "Kanniyakumari", routes: "350", via: "Nagercoil, Thuckalay, Kulasekharam" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "89A, PHS-32, 458", via: "Attoor, Thiruvattar" },
+  ],
+  "chittar-lake": [
+    { terminal: "Nagercoil Vadassery", routes: "341", via: "Thuckalay, Kulasekharam" },
+    { terminal: "Marthandam", routes: "86", via: "Arumanai, Kaliyal" },
+  ],
+  "pechiparai-dam": [
+    { terminal: "Nagercoil Vadassery", routes: "313, 349, 313M", via: "Thuckalay, Kulasekharam" },
+    { terminal: "Kanniyakumari", routes: "349", via: "Nagercoil, Thuckalay" },
+    { terminal: "Marthandam / Kalliyakkavilai", routes: "89D, 457, 331, 86G", via: "Thiruvattar, Kulasekharam, Arumanai, Kaliyal" },
+  ],
+  "mathur-aqueduct": [
+    { terminal: "Marthandam", routes: "89G, 89S", via: "Attoor, Thiruvattar" },
+  ],
+  "padmanabhapuram-palace": [
+    { terminal: "Nagercoil Vadassery", routes: "313, 349, 350", via: "Thuckalay" },
+    { terminal: "Nagercoil Anna", routes: "13J, 13N, 11L", via: "Villukuri, Thuckalay" },
+    { terminal: "Kanniyakumari", routes: "349, 350", via: "Suchindram, Nagercoil, Thuckalay" },
+  ],
+  "muttom-beach": [
+    { terminal: "Nagercoil Vadassery", routes: "14D", via: "Anna Bus Stand, Rajakkamangalam" },
+    { terminal: "Nagercoil Anna", routes: "14A, 14C, 14D, 5F, 5C", via: "Villukuri, Thuckalay" },
+    { terminal: "Kanniyakumari", routes: "302", via: "Kovalam, Manakudy" },
+  ],
+  "kalikesam-waterfall": [
+    { terminal: "Nagercoil Vadassery", routes: "4", via: "Vadassery, Thodikarankonam" },
+    { terminal: "Nagercoil Anna", routes: "4", via: "Villukuri, Thuckalay" },
+  ],
+};
+
 const makePlace = (place: PlaceSeed, index: number): Place => {
   const defaults = categoryDefaults[place.category];
   return {
@@ -78,6 +171,9 @@ const makePlace = (place: PlaceSeed, index: number): Place => {
     howToReach: place.howToReach ?? "Reach from Kanyakumari town by local bus, auto, taxi or a day-trip cab depending on distance.",
     nearbyBus: place.nearbyBus ?? "Kanyakumari or Nagercoil bus links connect onward to the nearest town stop.",
     tips: place.tips ?? defaults.tips,
+    virtualTourScene: place.virtualTourScene,
+    ferryBookingUrl: place.ferryBookingUrl,
+    busDetails: place.busDetails ?? officialBusDetails[place.id],
   };
 };
 
@@ -98,7 +194,9 @@ const placeSeeds: PlaceSeed[] = [
     "Sripada Mandapam",
     "Ferry ride from the mainland",
     "Panoramic sea views"
-  ]
+  ],
+  virtualTourScene: "Vivekananda Rock Memorial 01",
+  ferryBookingUrl: "https://psckfs.tn.gov.in/",
 },
   {
   id: "devi-kanyakumari-temple",
@@ -132,7 +230,42 @@ const placeSeeds: PlaceSeed[] = [
     "Thirukkural symbolism",
     "Sea-facing photo point",
     "Ferry-access monument"
-  ]
+  ],
+  virtualTourScene: "Thiruvalluvar  Statue 01",
+},
+{
+  id: "glass-bridge-kanyakumari",
+  name: "Kanyakumari Glass Bridge",
+  tagline: "A dramatic sea-crossing viewpoint beside the offshore monuments",
+  category: "Heritage",
+  rating: 4.6,
+  ticket: "Ferry ticket required",
+  timings: "During ferry service hours",
+  distance: "Offshore beside Vivekananda Rock Memorial",
+  description: "The Kanyakumari Glass Bridge offers an exhilarating view over the sea beside the district's iconic offshore landmarks. Its transparent walkway and open setting make it a memorable stop for visitors exploring the Vivekananda Rock Memorial and Thiruvalluvar Statue area.",
+  highlights: ["Sea-view glass walkway", "Views of the offshore monuments", "Reached by ferry"],
+  howToReach: "Take the government ferry from the Kanyakumari mainland jetty and follow the visitor route at the offshore memorial complex.",
+  nearbyBus: "Kanyakumari Bus Stand is the nearest public transport stop.",
+  tips: ["Book ferry tickets before peak hours", "Follow staff safety instructions", "Keep cameras and phones secure"],
+  mapQuery: "Kanyakumari Glass Bridge Tamil Nadu",
+  virtualTourScene: "Glass Bridge",
+},
+{
+  id: "chittar-lake",
+  name: "Chittar Lake",
+  tagline: "A peaceful reservoir landscape in Kanyakumari's green interior",
+  category: "Nature",
+  rating: 4.5,
+  ticket: "Free entry",
+  timings: "Daylight hours recommended",
+  distance: "Near Chittar, Kanyakumari district",
+  description: "Chittar Lake is a scenic inland waterbody surrounded by the lush landscapes of Kanyakumari district. It is a tranquil destination for visitors who enjoy open water views, greenery and photography away from the coastal bustle.",
+  highlights: ["Reservoir views", "Green surroundings", "Peaceful photography spot"],
+  howToReach: "Travel by private vehicle or taxi from Nagercoil or Kanyakumari via the Chittar area.",
+  nearbyBus: "Use local bus connections toward Chittar, then continue by auto or taxi.",
+  tips: ["Visit during daylight", "Carry water for the drive", "Respect local safety signage near the water"],
+  mapQuery: "Chittar Lake Kanyakumari Tamil Nadu",
+  virtualTourScene: "Chittar Lake Areial",
 },
 {
   id: "gandhi-mandapam",
@@ -148,7 +281,8 @@ const placeSeeds: PlaceSeed[] = [
     "Distinct memorial architecture",
     "Central town location",
     "Close to the seafront"
-  ]
+  ],
+  virtualTourScene: "Gandhi Manimandapam 01",
 },
 {
   id: "mathur-aqueduct",
@@ -365,6 +499,7 @@ const placeSeeds: PlaceSeed[] = [
 {
   id: "padmanabhapuram-palace",
   name: "Padmanabhapuram Palace",
+  virtualTourScene: "Padmanabhapuram Palace",
   tagline: "Travancore-era wooden palace with murals, carvings and courtyards",
   category: "Heritage",
   rating: 4.7,
@@ -1261,6 +1396,7 @@ Today, Guganathaswamy Temple continues to serve as an important place of worship
 {
   id: "kamarajar-mani-mandapam",
   name: "Kamarajar Mani Mandapam",
+  virtualTourScene: "Kamarajar Manimandapam 01",
   tagline: "Memorial honoring leader K. Kamaraj",
   category: "Heritage",
   ticket: "Free entry",
@@ -1611,6 +1747,7 @@ Today, Sothavilai Beach continues to attract travelers searching for a calm and 
 {
   id: "thirparappu-falls",
   name: "Thiruparrapu Falls / Tirparappu Water Falls",
+  virtualTourScene: "Thiruparappu Waterfalls",
   tagline: "Popular cascade on the Kodayar river",
   category: "Nature",
   ticket: "Nominal entry",

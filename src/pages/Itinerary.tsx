@@ -1,13 +1,98 @@
 import { useEffect, useState } from "react";
-import { Bus, Calendar, CloudSun, Compass, Navigation, Sparkles, Wallet, Loader2, Search, ExternalLink } from "lucide-react";
+import { Bus, Calendar, CloudSun, Compass, Navigation, Sparkles, Wallet, Loader2, Search, ExternalLink, MapPin, Route } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/i18n/I18nContext";
 import { generateGeminiItinerary, ItineraryDay } from "@/lib/gemini";
+import { Link } from "react-router-dom";
+import { places } from "@/data/places";
 
 type Interest = "Spiritual" | "Nature" | "Heritage" | "Food" | "Beach";
 type Pace = "Relaxed" | "Balanced" | "Packed";
 type TravelMode = "Cab" | "Bus";
+
+type JourneyLandmark = {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  nearby: string[];
+};
+
+type SavedTripRoute = {
+  start: RouteLocation;
+  end: RouteLocation;
+  stops: JourneyLandmark[];
+};
+
+type RouteLocation = {
+  id: string;
+  name: string;
+  mapQuery: string;
+  landmark?: JourneyLandmark;
+};
+
+type TripHistoryItem = {
+  id: string;
+  days: number;
+  budget: number;
+  route: SavedTripRoute;
+  savedAt: string;
+  itinerary: ItineraryDay[];
+};
+
+const journeyLandmarks: JourneyLandmark[] = [
+  { id: "vivekananda-rock-memorial", name: "Vivekananda Rock Memorial", lat: 8.0778, lon: 77.5550, nearby: ["glass-bridge-kanyakumari", "thiruvalluvar-statue"] },
+  { id: "glass-bridge-kanyakumari", name: "Kanyakumari Glass Bridge", lat: 8.0777, lon: 77.5540, nearby: ["vivekananda-rock-memorial", "thiruvalluvar-statue"] },
+  { id: "thiruvalluvar-statue", name: "Thiruvalluvar Statue", lat: 8.0771, lon: 77.5530, nearby: ["glass-bridge-kanyakumari", "vivekananda-rock-memorial"] },
+  { id: "devi-kanyakumari-temple", name: "Kumari Amman Temple", lat: 8.0796, lon: 77.5510, nearby: ["gandhi-mandapam", "vivekananda-rock-memorial"] },
+  { id: "gandhi-mandapam", name: "Gandhi Mandapam", lat: 8.0808, lon: 77.5520, nearby: ["devi-kanyakumari-temple", "vivekananda-rock-memorial"] },
+  { id: "kamarajar-mani-mandapam", name: "Kamarajar Mani Mandapam", lat: 8.0820, lon: 77.5517, nearby: ["gandhi-mandapam", "devi-kanyakumari-temple"] },
+  { id: "vattakottai-fort", name: "Vattakottai Fort", lat: 8.1276, lon: 77.5634, nearby: ["kanyakumari-beach", "vivekananda-rock-memorial"] },
+  { id: "padmanabhapuram-palace", name: "Padmanabhapuram Palace", lat: 8.2444, lon: 77.3294, nearby: ["mathur-aqueduct", "thirparappu-falls"] },
+  { id: "thirparappu-falls", name: "Thirparappu Falls", lat: 8.3922, lon: 77.2575, nearby: ["mathur-aqueduct", "pechiparai-dam"] },
+  { id: "mathur-aqueduct", name: "Mathur Aqueduct", lat: 8.3465, lon: 77.3052, nearby: ["padmanabhapuram-palace", "thirparappu-falls"] },
+];
+
+const distanceKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const radians = (value: number) => (value * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const latDelta = radians(lat2 - lat1);
+  const lonDelta = radians(lon2 - lon1);
+  const a = Math.sin(latDelta / 2) ** 2 + Math.cos(radians(lat1)) * Math.cos(radians(lat2)) * Math.sin(lonDelta / 2) ** 2;
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+const routeLocations: RouteLocation[] = places
+  .map((place) => ({
+    id: place.id,
+    name: place.name,
+    mapQuery: place.mapQuery ?? `${place.name}, Kanyakumari, Tamil Nadu`,
+    landmark: journeyLandmarks.find((landmark) => landmark.id === place.id),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const resolveRouteLocation = (id: string) => routeLocations.find((location) => location.id === id) ?? null;
+
+const distanceFromRouteKm = (point: JourneyLandmark, start: JourneyLandmark, end: JourneyLandmark) => {
+  const latitudeScale = 111;
+  const longitudeScale = 111 * Math.cos(((start.lat + end.lat) / 2 * Math.PI) / 180);
+  const routeX = (end.lon - start.lon) * longitudeScale;
+  const routeY = (end.lat - start.lat) * latitudeScale;
+  const pointX = (point.lon - start.lon) * longitudeScale;
+  const pointY = (point.lat - start.lat) * latitudeScale;
+  const routeLengthSquared = routeX ** 2 + routeY ** 2;
+  const progress = routeLengthSquared === 0 ? 0 : Math.max(0, Math.min(1, (pointX * routeX + pointY * routeY) / routeLengthSquared));
+  return Math.hypot(pointX - progress * routeX, pointY - progress * routeY);
+};
+
+const findRouteStops = (start: JourneyLandmark, end: JourneyLandmark) =>
+  journeyLandmarks
+    .filter((landmark) => landmark.id !== start.id && landmark.id !== end.id)
+    .map((landmark) => ({ landmark, distance: distanceFromRouteKm(landmark, start, end) }))
+    .filter(({ distance }) => distance <= 12)
+    .sort((a, b) => a.distance - b.distance)
+    .map(({ landmark }) => landmark);
 
 const INTERESTS: Interest[] = ["Spiritual", "Nature", "Heritage", "Food", "Beach"];
 const monthWeather = [
@@ -115,6 +200,16 @@ export default function Itinerary() {
   const [aiDays, setAiDays] = useState<ItineraryDay[]>([]);
   const [loadingAi, setLoadingAi] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [saveChoice, setSaveChoice] = useState<"idle" | "asking" | "route">("idle");
+  const [routeStart, setRouteStart] = useState("vivekananda-rock-memorial");
+  const [routeEnd, setRouteEnd] = useState("vattakottai-fort");
+  const [savedRoute, setSavedRoute] = useState<SavedTripRoute | null>(null);
+  const [tripHistory, setTripHistory] = useState<TripHistoryItem[]>([]);
+  const [routeError, setRouteError] = useState("");
+  const [journeyStarted, setJourneyStarted] = useState(false);
+  const [journeyStatus, setJourneyStatus] = useState("Save your trip to start location-aware recommendations.");
+  const [currentLandmark, setCurrentLandmark] = useState<JourneyLandmark | null>(null);
+  const [nearbyLandmarks, setNearbyLandmarks] = useState<JourneyLandmark[]>([]);
   const [busQuery, setBusQuery] = useState("");
   const [liveWeather, setLiveWeather] = useState<LiveWeather>({
     status: "Detecting your location for live weather...",
@@ -130,6 +225,15 @@ export default function Itinerary() {
   const matchingBuses = busServices.filter((bus) =>
     `${bus.route} ${bus.routeNo}`.toLowerCase().includes(busQuery.trim().toLowerCase()),
   );
+
+  useEffect(() => {
+    try {
+      const savedHistory = JSON.parse(localStorage.getItem("kanyakumari-trip-history") ?? "[]") as TripHistoryItem[];
+      if (Array.isArray(savedHistory)) setTripHistory(savedHistory);
+    } catch {
+      localStorage.removeItem("kanyakumari-trip-history");
+    }
+  }, []);
 
   const toggleInterest = (interest: Interest) => {
     setInterests((current) =>
@@ -150,12 +254,96 @@ export default function Itinerary() {
       });
       setAiDays(res);
       setGenerated(true);
+      setSaveChoice("asking");
+      setSavedRoute(null);
+      setJourneyStarted(false);
+      setNearbyLandmarks([]);
     } catch (err) {
       console.error(err);
     } finally {
       setLoadingAi(false);
     }
   };
+
+  const updateJourneyLocation = (coords: GeolocationCoordinates) => {
+    const ranked = journeyLandmarks
+      .map((landmark) => ({ landmark, distance: distanceKm(coords.latitude, coords.longitude, landmark.lat, landmark.lon) }))
+      .sort((a, b) => a.distance - b.distance);
+    const nearest = ranked[0];
+    const nearby = nearest && nearest.distance <= 2 ? nearest.landmark : null;
+    const suggestions = nearby
+      ? nearby.nearby.map((id) => journeyLandmarks.find((landmark) => landmark.id === id)).filter((landmark): landmark is JourneyLandmark => Boolean(landmark))
+      : ranked.slice(0, 3).map(({ landmark }) => landmark);
+
+    setCurrentLandmark(nearby);
+    setNearbyLandmarks(suggestions);
+    setJourneyStatus(nearby
+      ? `You're near ${nearby.name}. Your AI concierge has refreshed suggestions for this stop.`
+      : "You're on the move. Here are the closest places in your current area.");
+  };
+
+  const saveTripRoute = () => {
+    const start = resolveRouteLocation(routeStart);
+    const end = resolveRouteLocation(routeEnd);
+    if (!start || !end) {
+      setRouteError("Choose both locations from the list to save your route.");
+      return;
+    }
+    if (start.id === end.id) {
+      setRouteError("Choose different start and destination locations.");
+      return;
+    }
+    // Recommendations are only shown from the curated, geocoded landmark set.
+    // This avoids presenting an unrelated stop when a selected place has no verified route coordinate yet.
+    const stops = start.landmark && end.landmark ? findRouteStops(start.landmark, end.landmark) : [];
+    const route = { start, end, stops };
+    const trip: TripHistoryItem = {
+      id: `${Date.now()}`,
+      days,
+      budget,
+      route,
+      savedAt: new Date().toISOString(),
+      itinerary: aiDays,
+    };
+    const nextHistory = [trip, ...tripHistory].slice(0, 10);
+    setSavedRoute(route);
+    setTripHistory(nextHistory);
+    setSaveChoice("route");
+    setRouteError("");
+    setJourneyStarted(false);
+    setNearbyLandmarks(stops);
+    setJourneyStatus(stops.length
+      ? `Your ${start.name} to ${end.name} route is saved. These curated stops are close to the way.`
+      : `Your ${start.name} to ${end.name} route is saved. The map shows the selected route; verified stop suggestions are currently available for our mapped landmark locations.`);
+    localStorage.setItem("kanyakumari-active-trip", JSON.stringify(trip));
+    localStorage.setItem("kanyakumari-trip-history", JSON.stringify(nextHistory));
+  };
+
+  const openSavedTrip = (trip: TripHistoryItem) => {
+    setDays(trip.days);
+    setBudget(trip.budget);
+    setAiDays(trip.itinerary);
+    setRouteStart(trip.route.start.id);
+    setRouteEnd(trip.route.end.id);
+    setSavedRoute(trip.route);
+    setNearbyLandmarks(trip.route.stops);
+    setGenerated(true);
+    setSaveChoice("route");
+    setJourneyStarted(false);
+    setCurrentLandmark(null);
+    setRouteError("");
+    setJourneyStatus(`Viewing your saved ${trip.route.start.name} to ${trip.route.end.name} trip.`);
+  };
+
+  useEffect(() => {
+    if (!journeyStarted || !navigator.geolocation) return;
+    const watchId = navigator.geolocation.watchPosition(
+      ({ coords }) => updateJourneyLocation(coords),
+      () => setJourneyStatus("Location access is needed to recommend places as you travel."),
+      { enableHighAccuracy: true, maximumAge: 30000, timeout: 15000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [journeyStarted]);
 
   const loadWeather = (coords?: GeolocationCoordinates) => {
     const lat = coords?.latitude ?? 8.0883;
@@ -328,6 +516,96 @@ export default function Itinerary() {
                   </div>
                 ) : (
                   <div className="space-y-5">
+                    <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+                      {saveChoice === "asking" ? (
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h2 className="font-display text-xl font-bold">Save this trip and start your journey?</h2>
+                            <p className="mt-1 text-sm text-muted-foreground">Save it to get an AI-guided map of worthwhile tourist places along your route.</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="hero" onClick={() => setSaveChoice("route")}><Navigation className="h-4 w-4" /> Yes, save trip</Button>
+                            <Button variant="outline" onClick={() => setSaveChoice("idle")}>Not now</Button>
+                          </div>
+                        </div>
+                      ) : saveChoice === "route" && !savedRoute ? (
+                        <div>
+                          <div className="flex items-center gap-2 text-primary"><Route className="h-5 w-5" /><h2 className="font-display text-xl font-bold">Set up your saved route</h2></div>
+                          <p className="mt-1 text-sm text-muted-foreground">Tell us where you are starting and where you are going. The AI route assistant will add tourist stops that are near the way.</p>
+                          <div className="mt-4 grid gap-3 md:grid-cols-2">
+                            <label className="text-sm font-semibold">Start location
+                              <select value={routeStart} onChange={(event) => setRouteStart(event.target.value)} className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 font-normal">
+                                {routeLocations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
+                              </select>
+                            </label>
+                            <label className="text-sm font-semibold">Destination
+                              <select value={routeEnd} onChange={(event) => setRouteEnd(event.target.value)} className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 font-normal">
+                                {routeLocations.map((location) => <option key={location.id} value={location.id}>{location.name}</option>)}
+                              </select>
+                            </label>
+                          </div>
+                          {routeError && <p className="mt-3 text-sm font-medium text-destructive">{routeError}</p>}
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <Button variant="hero" onClick={saveTripRoute}><MapPin className="h-4 w-4" /> Save trip & show route map</Button>
+                            <Button variant="outline" onClick={() => setSaveChoice("asking")}>Back</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="flex items-center gap-2 text-primary"><Navigation className="h-5 w-5 animate-pulse" /><h2 className="font-display text-xl font-bold">Journey assistant is active</h2></div>
+                          <p className="mt-1 text-sm text-muted-foreground">{journeyStatus}</p>
+                          {savedRoute && (
+                            <div className="mt-4 overflow-hidden rounded-xl border border-border bg-background">
+                              <iframe
+                                title="Saved trip route map"
+                                className="h-64 w-full border-0"
+                                loading="lazy"
+                                src={`https://www.google.com/maps?saddr=${encodeURIComponent(savedRoute.start.mapQuery)}&daddr=${encodeURIComponent(savedRoute.end.mapQuery)}&output=embed`}
+                              />
+                              <div className="border-t border-border p-3 text-xs text-muted-foreground">Route: <span className="font-semibold text-foreground">{savedRoute.start.name}</span> to <span className="font-semibold text-foreground">{savedRoute.end.name}</span>. Pins shown are recommended nearby stops along this route.</div>
+                            </div>
+                          )}
+                          {currentLandmark && <p className="mt-3 text-sm font-semibold">At {currentLandmark.name}? Next, consider these nearby places:</p>}
+                          {nearbyLandmarks.length > 0 && (
+                            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                              {nearbyLandmarks.map((landmark, index) => (
+                                <Link key={landmark.id} to={`/places/${landmark.id}`} className="flex items-center gap-2 rounded-xl border border-primary/30 bg-background px-3 py-2.5 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground">
+                                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs">{index + 1}</span>
+                                  Visit {landmark.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                          {savedRoute && nearbyLandmarks.length === 0 && (
+                            <p className="mt-3 rounded-lg border border-border bg-background p-3 text-sm text-muted-foreground">
+                              This route is saved and can be revisited below. Stop suggestions are shown only when both selected places have verified coordinates in our curated route data.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {saveChoice === "idle" && <p className="mt-3 text-xs text-muted-foreground">Trip not saved. Generate another plan whenever you are ready.</p>}
+                    </section>
+                    {tripHistory.length > 0 && (
+                      <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-5 w-5 text-primary" />
+                          <div>
+                            <h2 className="font-display text-xl font-bold">Saved trip history</h2>
+                            <p className="text-sm text-muted-foreground">Your last {tripHistory.length} saved trip{tripHistory.length === 1 ? "" : "s"}.</p>
+                          </div>
+                        </div>
+                        <div className="mt-4 grid gap-3 md:grid-cols-2">
+                          {tripHistory.map((trip) => (
+                            <button key={trip.id} type="button" onClick={() => openSavedTrip(trip)} className="rounded-xl border border-border bg-background p-4 text-left transition-smooth hover:border-primary hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-primary">
+                              <p className="text-xs font-semibold uppercase tracking-wider text-primary">{new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(new Date(trip.savedAt))}</p>
+                              <h3 className="mt-1 font-semibold">{trip.route.start.name} to {trip.route.end.name}</h3>
+                              <p className="mt-1 text-sm text-muted-foreground">{trip.days} days · Rs. {trip.budget.toLocaleString()} budget · {trip.route.stops.length} recommended stop{trip.route.stops.length === 1 ? "" : "s"}</p>
+                              <span className="mt-3 inline-flex text-sm font-semibold text-primary">Open saved route →</span>
+                            </button>
+                          ))}
+                        </div>
+                      </section>
+                    )}
                     {aiDays.map((day) => (
                       <article key={day.day} className="overflow-hidden bg-card shadow-soft border border-border rounded-2xl">
                         <div className="flex flex-wrap items-center justify-between gap-3 gradient-sunset px-6 py-4 text-primary-foreground">

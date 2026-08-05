@@ -122,6 +122,9 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1">
+            <Link to="/onboard" className="hidden h-9 items-center rounded-full bg-secondary px-3 text-xs font-semibold text-secondary-foreground transition-smooth hover:bg-secondary/80 sm:flex">
+              Host
+            </Link>
             {isAdminLoggedIn ? (
               <div className="hidden items-center gap-1 sm:flex">
                 <Link to="/admin" className="h-9 items-center gap-1.5 rounded-full bg-primary/10 px-3 text-xs font-semibold text-primary transition-smooth hover:bg-primary/20 flex">
@@ -167,7 +170,7 @@ export default function Navbar() {
                 </NavLink>
               ))}
               <Link to="/onboard" onClick={() => setOpen(false)} className="px-3 py-3 text-sm font-medium text-primary">
-                {t("list_business")} -&gt;
+                Host - {t("list_business")}
               </Link>
               <button onClick={(e) => { setOpen(false); handleAdminClick(e); }} className="px-3 py-3 text-left text-sm font-medium text-primary">
                 {isAdminLoggedIn ? "Admin Dashboard" : "Admin Login"}
