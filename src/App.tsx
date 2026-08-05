@@ -9,6 +9,7 @@ import PlaceDetail from "./pages/PlaceDetail";
 import Itinerary from "./pages/Itinerary";
 import Stays from "./pages/Stays";
 import Experiences from "./pages/Experiences";
+import ExperienceDetail from "./pages/ExperienceDetail";
 import FoodEvents from "./pages/FoodEvents";
 import Onboard from "./pages/Onboard";
 import SearchPage from "./pages/SearchPage";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/itinerary" element={<Itinerary />} />
           <Route path="/stays" element={<Stays />} />
           <Route path="/experiences" element={<Experiences />} />
+          <Route path="/experiences/:id" element={<ExperienceDetail />} />
           <Route path="/food" element={<FoodEvents />} />
           <Route path="/onboard" element={<Onboard />} />
           <Route path="/search" element={<SearchPage />} />

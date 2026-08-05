@@ -1,6 +1,7 @@
 import { experiences } from "@/data/experiences";
 import { Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function Experiences() {
   return (
@@ -30,7 +31,7 @@ export default function Experiences() {
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <p className="font-display text-xl font-bold">₹{e.price.toLocaleString()}<span className="text-xs font-normal text-muted-foreground"> /person</span></p>
-                <Button variant="hero" size="sm">Book</Button>
+                <Button asChild variant="hero" size="sm"><Link to={`/experiences/${e.id}`}>View now</Link></Button>
               </div>
             </div>
           </article>
