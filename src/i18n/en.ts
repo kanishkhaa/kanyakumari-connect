@@ -66,7 +66,7 @@ export const en = {
 
   // itinerary planner
   itinerary_title: "AI-Powered Trip Planner",
-  itinerary_subtitle: "Customized day-wise itinerary generated instantly by Gemini AI",
+  itinerary_subtitle: "Instant personalized day-wise travel planning",
   itinerary_generate_ai: "Generate Custom Trip with AI",
   days: "Duration (Days)",
   budget: "Budget Range",
