@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bus, Calendar, CloudSun, Compass, Navigation, Sparkles, Wallet, Loader2 } from "lucide-react";
+import { Bus, Calendar, CloudSun, Compass, Navigation, Sparkles, Wallet, Loader2, Search, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/i18n/I18nContext";
@@ -34,6 +34,55 @@ const howToReach = [
   },
 ];
 
+type BusService = {
+  route: string;
+  routeNo: string;
+  services: number;
+  duration: string;
+  fare: string;
+};
+
+// TNSTC Nagercoil Region - Sectorwise Mofussil Services (source schedule: 2018).
+const busServices: BusService[] = [
+  ["Nagercoil - Thiruvananthapuram", "451FP", 29, "2h 00m", "Rs. 72"],
+  ["Colachel - Thiruvananthapuram", "453", 1, "2h 00m", "Rs. 69"],
+  ["Colachel - Thiruvananthapuram", "454", 1, "2h 30m", "Rs. 61"],
+  ["Thengapattinam - Thiruvananthapuram", "455", 1, "2h 00m", "Rs. 51"],
+  ["Kollencode - Thiruvananthapuram", "456", 1, "2h 00m", "Rs. 42"],
+  ["Pechiparai - Thiruvananthapuram", "457", 1, "2h 30m", "Rs. 58"],
+  ["Thirparappu - Thiruvananthapuram", "458", 1, "2h 30m", "Rs. 55"],
+  ["Manavalakurichy - Thiruvananthapuram", "463", 1, "2h 30m", "Rs. 71"],
+  ["Kanyakumari - Thiruvananthapuram", "475", 1, "3h 00m", "Rs. 96"],
+  ["Kanyakumari - Nedumangad", "450", 1, "3h 00m", "Rs. 102"],
+  ["Nagercoil - Thanjavur (bypass rider)", "505-TAN", 2, "10h 00m", "Rs. 313"],
+  ["Marthandam - Coimbatore", "505-CBE", 6, "11h 20m", "Rs. 378"],
+  ["Nagercoil - Dindigul", "505-DIN", 5, "7h 25m", "Rs. 248"],
+  ["Nagercoil - Tiruppur", "505/TPR", 5, "10h 00m", "Rs. 336"],
+  ["Kanyakumari - Rameswaram (via Madurai)", "505/RAME", 1, "9h 50m", "Rs. 339"],
+  ["Kanyakumari - Rameswaram (via Thoothukudi)", "579/RAME", 2, "8h 00m", "Rs. 257"],
+  ["Nagercoil - Tiruchirappalli (via Madurai)", "505-TRI", 3, "8h 55m", "Rs. 289"],
+  ["Kaliakkavilai - Salem (via Madurai)", "505-SLM", 2, "11h 40m", "Rs. 413"],
+  ["Nagercoil - Palani (via Madurai)", "505-PAL", 2, "9h 00m", "Rs. 284"],
+  ["Nagercoil - Kodaikanal (via Madurai)", "505-KOD", 2, "9h 40m", "Rs. 288"],
+  ["Kaliakkavilai - Velankanni (via Thoothukudi)", "505-VKI", 2, "12h 50m", "Rs. 405"],
+  ["Nagercoil - Periakulam (via Madurai)", "505/PERI", 1, "7h 30m", "Rs. 261"],
+  ["Monday Market - Karaikudi (via Madurai)", "505K", 1, "9h 25m", "Rs. 268"],
+  ["Nagercoil - Kumuli (via Rajapalayam, Theni)", "622", 7, "6h 55m", "Rs. 271"],
+  ["Nagercoil - Madurai (bypass rider via Tirunelveli)", "505-EXP", 4, "4h 40m", "Rs. 218"],
+  ["Nagercoil - Madurai", "505", 11, "5h 00m", "Rs. 192"],
+  ["Nagercoil - Papanasam (via Cheranmahadevi)", "567", 2, "4h 00m", "Rs. 80"],
+  ["Nagercoil - Sivakasi (via Sattur)", "585X", 2, "4h 30m", "Rs. 141"],
+  ["Nagercoil - Tirunelveli (via Eruvadi)", "564-PP", 11, "1h 00m", "Rs. 59"],
+  ["Nagercoil - Tirunelveli (end to end)", "565-EE", 20, "1h 15m", "Rs. 66"],
+  ["Nagercoil - Tirunelveli (via Nanguneri)", "565-PP", 11, "1h 45m", "Rs. 67"],
+  ["Nagercoil - Thoothukudi (via Tirunelveli)", "579", 4, "3h 00m", "Rs. 102"],
+  ["Nagercoil - Thiruchendur (via Tirunelveli)", "586", 2, "3h 00m", "Rs. 108"],
+  ["Nagercoil - Thiruchendur (via Valliyoor)", "576", 22, "3h 15m", "Rs. 87"],
+  ["Nagercoil - Thoothukudi (via Koodankulam)", "570", 10, "4h 00m", "Rs. 117"],
+  ["Nagercoil - Thoothukudi (via Valliyoor)", "595", 11, "4h 15m", "Rs. 115"],
+  ["Marthandam - Nagercoil", "311-LSS", 9, "1h 00m", "Rs. 24"],
+].map(([route, routeNo, services, duration, fare]) => ({ route, routeNo, services, duration, fare }));
+
 type LiveWeather = {
   status: string;
   place: string;
@@ -66,6 +115,7 @@ export default function Itinerary() {
   const [aiDays, setAiDays] = useState<ItineraryDay[]>([]);
   const [loadingAi, setLoadingAi] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [busQuery, setBusQuery] = useState("");
   const [liveWeather, setLiveWeather] = useState<LiveWeather>({
     status: "Detecting your location for live weather...",
     place: "Your location",
@@ -77,6 +127,9 @@ export default function Itinerary() {
   const stayCost = Math.round(perDayBudget * 0.45);
   const foodCost = Math.round(perDayBudget * 0.25);
   const activityCost = Math.max(perDayBudget - stayCost - foodCost - transportCost, 0);
+  const matchingBuses = busServices.filter((bus) =>
+    `${bus.route} ${bus.routeNo}`.toLowerCase().includes(busQuery.trim().toLowerCase()),
+  );
 
   const toggleInterest = (interest: Interest) => {
     setInterests((current) =>
@@ -357,6 +410,58 @@ export default function Itinerary() {
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{item.text}</p>
                 </div>
               ))}
+
+              <section className="overflow-hidden bg-card border border-border rounded-2xl shadow-soft">
+                <div className="border-b border-border p-6">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <Bus className="h-6 w-6 text-primary" />
+                        <h3 className="font-display text-xl font-bold">Available buses</h3>
+                      </div>
+                      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                        TNSTC Nagercoil Region mofussil services from the supplied schedule. Fares, timings and service counts can change - confirm your journey before travel.
+                      </p>
+                    </div>
+                    <a
+                      href="https://www.kkbustime.com/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg border border-primary px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                    >
+                      Check current bus times <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </div>
+
+                  <label className="relative mt-5 block max-w-xl">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="search"
+                      value={busQuery}
+                      onChange={(event) => setBusQuery(event.target.value)}
+                      placeholder="Search a town or route number..."
+                      className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-3 text-sm outline-none ring-primary focus:ring-2"
+                    />
+                  </label>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[720px] text-left text-sm">
+                    <thead className="bg-muted/60 text-xs uppercase tracking-wider text-muted-foreground">
+                      <tr><th className="px-6 py-3 font-semibold">Route</th><th className="px-4 py-3 font-semibold">No.</th><th className="px-4 py-3 font-semibold">Daily services</th><th className="px-4 py-3 font-semibold">Journey time</th><th className="px-6 py-3 font-semibold text-right">Listed fare</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {matchingBuses.map((bus) => (
+                        <tr key={`${bus.routeNo}-${bus.route}`} className="transition-colors hover:bg-muted/40">
+                          <td className="px-6 py-3.5 font-medium">{bus.route}</td><td className="px-4 py-3.5 text-muted-foreground">{bus.routeNo}</td><td className="px-4 py-3.5">{bus.services}</td><td className="px-4 py-3.5">{bus.duration}</td><td className="px-6 py-3.5 text-right font-semibold text-primary">{bus.fare}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {matchingBuses.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No matching services in this schedule.</p>}
+                </div>
+                <p className="border-t border-border px-6 py-3 text-xs text-muted-foreground">Schedule source: TNSTC Tirunelveli Limited, Nagercoil Region sectorwise mofussil services (2018).</p>
+              </section>
             </div>
           </TabsContent>
         </Tabs>
