@@ -13,7 +13,7 @@ export default function Specialities() {
               Explore the Specialities of Kanyakumari
             </h1>
           </div>
-          <p className="text-base md:text-lg leading-relaxed text-[#5f594e] max-w-3xl">
+          <p className="text-base md:text-lg leading-relaxed text-[#5f594e] max-w-none">
             Discover Kanyakumari through its three seas, sacred shrines, Travancore heritage, Western Ghats, coastal food and handmade souvenirs. Each tile opens a chapter of the cape's living landscape.
           </p>
         </div>

@@ -15,7 +15,7 @@ export default function VideoGallery() {
 
   return (
     <div className="container mx-auto py-12">
-      <header className="max-w-3xl">
+      <header className="max-w-none">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">Gallery</p>
         <h1 className="mt-2 font-display text-5xl font-bold">{t("video_title")}</h1>
         <p className="mt-4 text-muted-foreground text-lg">{t("video_intro")}</p>

@@ -59,6 +59,10 @@ import placeMahaviSwami from "@/assets/place-mahavirswami.jpg";
 import placeChothavizhai from "@/assets/place-chothavizhai.jpg";
 import placeThiruparuppuFalls from "@/assets/place-thiruparuppufalls.jpg";
 import placeKeeriparai from "@/assets/place-keeriparai.jpg";
+import placeGlassBridge from "@/assets/place-glassbridge.jpg";
+import placeKovalamBeach from "@/assets/place-kovalambeach.png";
+import placeChittarLake from "@/assets/place-chittarlake.png";
+import placeKodayarTwinFalls from "@/assets/place-kodayartwinfalls.jpg";
 import staysAnnaiResorts from "@/assets/stays-annairesorts.jpg";
 import anantyaImage from "@/assets/stays-anantya.jpg";
 import staysSeaFace from "@/assets/stays-seaface.jpg";
@@ -90,6 +94,10 @@ import staysTempleCiti from "@/assets/stays-templeciti.jpg";
 // Suggested filenames: use the matching id, for example src/assets/vivekananda-rock-memorial.jpg.
 
 export const placeImages: Record<string, string> = {
+  "glass-bridge-kanyakumari": placeGlassBridge,
+  "kovalam-beach": placeKovalamBeach,
+  "chittar-lake": placeChittarLake,
+  "kodayar-twin-falls": placeKodayarTwinFalls,
   "vivekananda-rock-memorial": placeVivekanandhaRock,
   "thiruvalluvar-statue": placeThiruvalluvar,
   "devi-kanyakumari-temple": placeKumariAmmanTemple,

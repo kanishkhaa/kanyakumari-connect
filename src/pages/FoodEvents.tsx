@@ -68,7 +68,7 @@ export default function FoodEvents() {
   return (
     <div className="container mx-auto py-12 space-y-20">
       <section>
-        <header className="max-w-2xl">
+        <header className="max-w-none">
           <p className="text-sm font-semibold uppercase tracking-wider text-primary">Food discovery</p>
           <h1 className="mt-2 font-display text-5xl font-bold">Must-try dishes</h1>
           <p className="mt-4 text-muted-foreground text-lg">

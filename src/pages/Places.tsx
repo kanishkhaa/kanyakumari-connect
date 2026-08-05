@@ -11,7 +11,11 @@ export default function Places() {
   const { t, lang } = useI18n();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<(typeof categories)[number]>("All");
-  const { data: places } = useCollection("places", fallbackPlaces);
+  const { data: storedPlaces } = useCollection("places", fallbackPlaces);
+  const places = useMemo(() => {
+    const storedIds = new Set(storedPlaces.map((place) => place.id));
+    return [...storedPlaces, ...fallbackPlaces.filter((place) => !storedIds.has(place.id))];
+  }, [storedPlaces]);
 
   const filtered = useMemo(() => {
     return places.map((p) => getTranslatedPlace(p, lang)).filter((p) => {
@@ -23,7 +27,7 @@ export default function Places() {
 
   return (
     <div className="container mx-auto py-12">
-      <header className="max-w-2xl">
+      <header className="max-w-none">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">{t("nav_where")}</p>
         <h1 className="mt-2 font-display text-5xl font-bold">{t("explore_places")}</h1>
         <p className="mt-4 text-muted-foreground text-lg">

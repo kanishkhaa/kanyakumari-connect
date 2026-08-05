@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 export default function Experiences() {
   return (
     <div className="container mx-auto py-12">
-      <header className="max-w-2xl">
+      <header className="max-w-none">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">Local experiences</p>
         <h1 className="mt-2 font-display text-5xl font-bold">Live like a local</h1>
         <p className="mt-4 text-muted-foreground text-lg">

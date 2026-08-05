@@ -51,10 +51,10 @@ export type Video = {
 };
 
 export const videos: Video[] = [
-  { id: "v1", title: "Kanyakumari in 60 seconds", duration: "1:02", category: "Highlights", poster: beach, youtubeId: "ScMzIvxBSi4" },
-  { id: "v2", title: "Aerial — Vivekananda Rock & Thiruvalluvar", duration: "2:34", category: "Drone", poster: vivek, youtubeId: "ScMzIvxBSi4" },
-  { id: "v3", title: "Kani tribal kitchen", duration: "4:18", category: "Food", poster: village, youtubeId: "ScMzIvxBSi4" },
-  { id: "v4", title: "Margazhi at the temple", duration: "3:45", category: "Culture", poster: dance, youtubeId: "ScMzIvxBSi4" },
-  { id: "v5", title: "Padmanabhapuram walkthrough", duration: "5:12", category: "Culture", poster: palace, youtubeId: "ScMzIvxBSi4" },
-  { id: "v6", title: "Drone over Sothavilai beach", duration: "2:01", category: "Drone", poster: beach, youtubeId: "ScMzIvxBSi4" },
+  { id: "v1", title: "Kanyakumari in 60 sec", duration: "1:02", category: "Highlights", poster: beach, youtubeId: "VBlrMG2eSbo" },
+  { id: "v2", title: "Aerial — Vivekananda Rock & Thiruvalluvar", duration: "2:34", category: "Drone", poster: vivek, youtubeId: "zPI5RSMiLCM" },
+  { id: "v3", title: "Kani tribal kitchen Food", duration: "4:18", category: "Food", poster: village, youtubeId: "6kgm9PkN7dQ" },
+  { id: "v4", title: "Margazhi at the temple", duration: "3:45", category: "Culture", poster: dance, youtubeId: "cp16Eya0CeQ" },
+  { id: "v5", title: "Padmanabhapuram walkthrough", duration: "5:12", category: "Culture", poster: palace, youtubeId: "0UUYDc-BOTQ" },
+  { id: "v6", title: "Drone over Sothavilai beach", duration: "2:01", category: "Drone", poster: beach, youtubeId: "wMV3cjRMV3E" },
 ];

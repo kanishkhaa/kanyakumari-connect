@@ -209,7 +209,7 @@ export default function TravelCare() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h1 className="font-display text-4xl font-bold md:text-5xl">Travel Care</h1>
-                  <p className="mt-4 max-w-3xl leading-relaxed text-muted-foreground">
+                  <p className="mt-4 max-w-none leading-relaxed text-muted-foreground">
                     Register or login, submit a travel query, and track official replies from the TravelCare admin desk.
                   </p>
                 </div>

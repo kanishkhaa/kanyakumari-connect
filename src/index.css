@@ -118,4 +118,12 @@
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-elevated { box-shadow: var(--shadow-elevated); }
   .transition-smooth { transition: var(--transition-smooth); }
+
+  /* Let page introductions use the available desktop width while keeping their mobile layout unchanged. */
+  @media (min-width: 1280px) {
+    .container > header.max-w-2xl,
+    .container > header.max-w-3xl {
+      max-width: none;
+    }
+  }
 }

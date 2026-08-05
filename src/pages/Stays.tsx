@@ -84,7 +84,7 @@ export default function Stays() {
 
   return (
     <div className="container mx-auto py-12">
-      <header className="max-w-3xl">
+      <header className="max-w-none">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">Where to stay</p>
         <h1 className="mt-2 font-display text-5xl font-bold">Find your Kanyakumari stay</h1>
         <p className="mt-4 text-lg text-muted-foreground">Browse verified properties with planning information, direct map links and official contact options where available.</p>

@@ -401,7 +401,7 @@ export default function Itinerary() {
 
   return (
     <div className="container mx-auto py-12 px-4">
-      <header className="max-w-3xl">
+      <header className="max-w-none">
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">{t("nav_plan")}</p>
         <h1 className="mt-2 font-display text-4xl md:text-5xl font-bold">{t("itinerary_title")}</h1>
         <p className="mt-4 text-muted-foreground text-lg">{t("itinerary_subtitle")}</p>
