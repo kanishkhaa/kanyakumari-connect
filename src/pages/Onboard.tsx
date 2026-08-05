@@ -58,6 +58,9 @@ export default function Onboard() {
         phone: String(form.get("phone")),
         email: String(form.get("email") || "pending@kaniya.local"),
         speciality: String(form.get("description")),
+        location: String(form.get("town")),
+        mapLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business} ${String(form.get("town"))}`)}`,
+        logo: "",
       };
       saveVendorOperator(operator);
       await insertRow("vendor_applications", { listing_type: "operator", payload: operator, status: operator.verified ? "approved" : "needs_review" });
