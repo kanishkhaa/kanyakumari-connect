@@ -122,7 +122,7 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1">
-            <Link to="/onboard" className="hidden h-9 items-center rounded-full bg-secondary px-3 text-xs font-semibold text-secondary-foreground transition-smooth hover:bg-secondary/80 sm:flex">
+            <Link to="/onboard" className="hidden h-9 items-center rounded-full bg-primary px-3 text-xs font-semibold text-primary-foreground transition-smooth hover:bg-primary/90 sm:flex">
               Host
             </Link>
             {isAdminLoggedIn ? (
