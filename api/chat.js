@@ -7,6 +7,13 @@ import { dtpcCenters } from '../src/data/dtpc';
 import { experiences } from '../src/data/experiences';
 import { operators } from '../src/data/operators';
 
+// Groq's on-demand tier accepts 12k tokens per minute. Keep the tourism
+// context well below that budget so there is room for the instructions,
+// conversation history, and the generated answer.
+const MAX_CONTEXT_CHARS = 12000;
+const MAX_HISTORY_TURNS = 6;
+const MAX_HISTORY_MESSAGE_CHARS = 1000;
+
 function findRelevantContext(message) {
   const q = message.toLowerCase();
   const sections = [];
@@ -41,20 +48,26 @@ function findRelevantContext(message) {
     sections.push(`PLACES_OVERVIEW:\n${JSON.stringify(places?.slice(0, 10))}`);
   }
 
-  return sections.join('\n\n');
+  return sections.join('\n\n').slice(0, MAX_CONTEXT_CHARS);
 }
 
-function trimHistory(history, maxTurns = 8) {
-  return history.slice(-maxTurns);
+function trimHistory(history, maxTurns = MAX_HISTORY_TURNS) {
+  if (!Array.isArray(history)) return [];
+
+  return history.slice(-maxTurns).map((entry) => ({
+    role: entry?.role === 'bot' ? 'bot' : 'user',
+    text: String(entry?.text ?? '').slice(0, MAX_HISTORY_MESSAGE_CHARS),
+  }));
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { message, lang = 'en', history = [] } = req.body || {};
-  if (!message) return res.status(400).json({ error: 'message is required' });
+  if (!message || typeof message !== 'string') return res.status(400).json({ error: 'message is required' });
+  const userMessage = message.slice(0, MAX_HISTORY_MESSAGE_CHARS);
 
-  const context = findRelevantContext(message);
+  const context = findRelevantContext(userMessage);
   console.log('--- CONTEXT SENT TO GROQ ---');
 console.log(context.slice(0, 500)); // first 500 chars, enough to verify it's real data
 console.log('--- END CONTEXT ---');
@@ -85,7 +98,7 @@ ${context}`;
         messages: [
           { role: 'system', content: systemPrompt },
           ...trimmedHistory.map((h) => ({ role: h.role === 'bot' ? 'assistant' : 'user', content: h.text })),
-          { role: 'user', content: message },
+          { role: 'user', content: userMessage },
         ],
         temperature: 0.25,
         max_tokens: 500,
